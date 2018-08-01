@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="6dp">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/borders"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1">
+
+            <TextView
+                android:id="@+id/coinLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6sp"
+                android:layout_marginStart="10sp"
+                android:fontFamily="@font/cryptofont_webfont"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@color/textColorWhatsOnCrypto"
+                android:textSize="36sp"
+                app:fontFamily="@font/cryptofont_webfont" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15">
+
+            <TextView
+                android:id="@+id/coinName"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6sp"
+                android:layout_marginStart="6sp"
+                android:gravity="center"
+                android:text="name"
+                android:textColor="@android:color/white"
+                android:textSize="36sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3">
+
+
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6sp"
+                android:layout_marginStart="6sp"
+                android:gravity="center"
+                android:text="price"
+                android:textColor="@color/textColorWhatsOnCrypto"
+                android:textSize="36sp" />
+
+            <ImageView
+                android:id="@+id/evolutionArrow"
+                android:layout_width="5dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:color/transparent" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2">
+
+            <TextView
+                android:id="@+id/evolutionPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="percentage"
+                android:textColor="@color/textColorWhatsOnCrypto"
+                android:textSize="36sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.25">
+
+            <ImageView
+                android:id="@+id/coinDetails"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center|end"
+                android:padding="10dp"
+                app:srcCompat="@drawable/coin_details" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

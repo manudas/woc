@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="textColorWhatsOnCrypto">#f89d1e</color>
+    <color name="borderColorWhatsOnCrypto">#F89D1E</color>
+
+    <color name="black_overlay">#66000000</color>
+</resources>
