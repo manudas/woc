@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import app.manu.whatsoncrypto.R
 import app.manu.whatsoncrypto.models.CoinMarketModel
+import org.json.JSONObject
 
 
 class CoinMarketDetails : AppCompatActivity() {
@@ -85,17 +86,31 @@ class CoinMarketDetails : AppCompatActivity() {
             //The key argument here must match that used in the other activity
 
 
+/*
+            val f : (Any?) -> Any? = { _details: Any? ->
+                    mCoinMarketModel::saveCoinDetails.call(coin_name, _details)
+            }
+*/
+            val f : (Any?) -> Any? = { _details: Any? ->
+                mCoinMarketModel.saveCoinDetails(coin_name, _details)
+            }
+
+            val onFinish_func_array =
+                    listOf<(Any?) -> Any?>(
+                       f as (Any?) -> Any?
+                    )
+
+
             /* function to call:
 
-             mCoinMarketModel::getPriceDetails(coin: String,
-                granularity: price_granularity,
-                toDate: Date?,
-                destination_currency: CoinMarket.Companion.CURRENCY_TO?,
-                onFinish : List<(Any?) -> Any?> ) {
+            mCoinMarketModel::getPriceDetails(coin: String,
+               granularity: price_granularity,
+               toDate: Date?,
+               destination_currency: CoinMarket.Companion.CURRENCY_TO?,
+               onFinish : List<(Any?) -> Any?> ) {
 
-             */
-            val onFinish_func_array = listOf<(Any?) -> Any?>(
-                    mCoinMarketModel::saveCoinDetails as (Any?) -> Any?)
+            */
+
             mCoinMarketModel.getPriceDetails(coin_name, CoinMarketModel.Companion.price_granularity.MINUTE , null, null, onFinish_func_array )
         }
         else {

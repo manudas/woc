@@ -30,6 +30,10 @@ class CoinMarketModel {
         private val maxResultPerApiCall = 2000
         private val maxApiMinuteResolution : Long = 60 * 24 * 7  // in seconds 60 seconds an hour / 24 hours a day / 7 days
 
+        /**
+         * Enumerator that tells us how much information we need
+         * splitted in periods
+         */
         public enum class price_granularity (val action: action, val time_lapse_in_seconds: Int, val limitApiResults: Int){
             MINUTE(action.MINUTE_HISTORICAL,
                     24 * 60 * 60 /* one day */,
@@ -173,6 +177,14 @@ class CoinMarketModel {
         }
     }
 
+    /**
+     * Asks the api for the whole list of coins
+     * ordered in the way that seems most important
+     * to itself
+     *
+     * USED IN: not used at the moment
+     *
+     */
     public fun getCoinList(onFinish : List<(Any?) -> Any?>) {
         _mOnFinishAsyncMachineFunctions.clear()
         _mOnFinishAsyncMachineFunctions.addAll( onFinish )
@@ -190,6 +202,13 @@ class CoinMarketModel {
         _myAsyncMachine!!.execute()
     }
 
+    /**
+     * Asks the api for the most traded coins
+     * by volume in the current day
+     *
+     * USED IN ConMarket Activity
+     *
+     */
     public fun getCoinListByVolume(limit: Int?, page: Int?, to: String?, onFinish : List<(Any?) -> Any?>) {
         _mOnFinishAsyncMachineFunctions.clear()
         _mOnFinishAsyncMachineFunctions.addAll( onFinish )
@@ -219,6 +238,13 @@ class CoinMarketModel {
         _myAsyncMachine!!.execute()
     }
 
+    /**
+     * Asks the API for the details of the most
+     * traded coins by volume in the current day
+     *
+     * USED IN ConMarket Activity
+     *
+     */
     public fun getCoinDetailsListByVolume(limit: Int?, page: Int?, to: String?, onFinish : List<(Any?) -> Any?>) {
 
         /* Function to execute once we have the top list by volume */
@@ -266,6 +292,14 @@ class CoinMarketModel {
         getCoinListByVolume(limit, page, to, func_array)
     }
 
+    /**
+     * Saves, as a cache, the list of most traded coins
+     * by volume, that we previously got from the API
+     * in form of JSON
+     *
+     * USED IN ConMarket Activity
+     *
+     */
     public fun cacheCoinList(json_query_result: JSONObject?) {
         var arr = jsonCoinByVolumeAsArray(json_query_result)
         mCurrentIndexToArraySymbolMap.clear()
@@ -280,6 +314,14 @@ class CoinMarketModel {
         mCurrentCoinList = arr
     }
 
+    /**
+     * Returns the list of most traded coins by volume, that
+     * we previously got from the API in form of JSON, and
+     * returns it in an array.
+     *
+     * USED IN ConMarket Activity
+     *
+     */
     private fun jsonCoinByVolumeAsArray(json_query_result: JSONObject?) : SparseArray<MutableMap<String, MutableMap<String, Any>>> {
         val data = json_query_result!!.get("Data") as JSONArray
         val sparse_result = SparseArray<MutableMap<String, MutableMap<String, Any>>>()
@@ -313,6 +355,14 @@ class CoinMarketModel {
         return sparse_result
     }
 
+    /**
+     * Saves the info returned from the API call to get the
+     * percentage, current price, percentage variation, etc...
+     * in Companion cache.
+     *
+     * USED IN ConMarket Activity
+     *
+     */
     public fun cacheCoinDetailsList(json_query_result: JSONObject?) : SparseArray<MutableMap<String, MutableMap<String, Any>>>? {
         var arr = jsonCoinDetailsByVolumeAsMap(json_query_result)
 
@@ -328,6 +378,9 @@ class CoinMarketModel {
         return mCurrentCoinList
     }
 
+    /**
+     * Returns the details used in ConMarket Activity as a Map
+     */
     private fun jsonCoinDetailsByVolumeAsMap(json_query_result: JSONObject?) : MutableMap<String, Map<String, Any>> {
         val data = json_query_result!!.get("RAW") as JSONObject
 
@@ -360,6 +413,14 @@ class CoinMarketModel {
         return coinMap
     }
 
+    /**
+     * Returns the list of coins given by the API
+     * as a JSON converted in an SparseArray
+     * 
+     * USED IN: not used at the moment, to be used
+     * just in case in conjunction with getCoinList
+     * 
+     */
     private fun jsonAllCoinAsArray(json_query_result: JSONObject?) : SparseArray<Map<String, Map<String, Any>>> {
         val data = json_query_result!!.get("Data") as JSONObject
         val sparse_result = SparseArray<Map<String, Map<String, Any>>>()
@@ -382,7 +443,13 @@ class CoinMarketModel {
         return sparse_result
     }
 
-
+    /**
+     * Asks the API for the PRICE details of the 
+     * coin passed as a parameter
+     *
+     * USED IN ConMarketDetails Activity
+     *
+     */
     public fun getPriceDetails(coin: String, granularity: price_granularity, toDate: Date?, destination_currency: CoinMarket.Companion.CURRENCY_TO?, onFinish : List<(Any?) -> Any?> ) {
 
         val mCalendar = Calendar.getInstance(TimeZone.getTimeZone("utc"))
@@ -451,7 +518,16 @@ class CoinMarketModel {
 
     }
 
-    public fun saveCoinDetails(details: Any?): Any? {
+    /**
+     * Saves, as a cache, the PRICE details of
+     * the coin passed as a parameter
+     *
+     * USED IN ConMarketDetails Activity
+     *
+     */
+    public fun saveCoinDetails(vararg details: Any?): Any? {
+        val _coinname = details[0]
+        val _detail = (details[1]) as JSONObject?
 
         return null
     }
