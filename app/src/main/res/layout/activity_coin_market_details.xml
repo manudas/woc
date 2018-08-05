@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="COIN MARKET CAP"
-            android:textColor="#F89D1E"
+            android:textColor="@color/textColorWhatsOnCrypto"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -113,7 +113,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="PRECIO MONEDA" />
+                android:text="PRECIO MONEDA"
+                android:textColor="@color/textColorWhatsOnCrypto" />
 
         </RelativeLayout>
 
@@ -163,8 +164,9 @@
             <!-- layout_weight per line 0,0667 -->
 
             <com.jjoe64.graphview.GraphView
+                android:id="@+id/graph_view"
                 android:layout_width="match_parent"
-                android:layout_height="0dp" />
+                android:layout_height="match_parent" />
 
         </RelativeLayout>
 
@@ -189,7 +191,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="MARKET CAP" />
+                        android:text="MARKET CAP"
+                        android:textColor="@android:color/white" />
 
                 </RelativeLayout>
 
@@ -209,13 +212,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
-                            android:text="MARKET CAP IN USD / EUR. modify programatly" />
+                            android:text="MARKET CAP IN USD / EUR. modify programatly"
+                            android:textColor="@color/textColorWhatsOnCrypto" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
-                            android:text="MARKET CAP IN BTC. modify programatly" />
+                            android:text="MARKET CAP IN BTC. modify programatly"
+                            android:textColor="@color/textColorWhatsOnCrypto" />
 
                     </LinearLayout>
                 </RelativeLayout>
@@ -244,7 +249,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="VOLUME (24H)" />
+                        android:text="VOLUME (24H)"
+                        android:textColor="@android:color/white" />
 
                 </RelativeLayout>
 
@@ -265,13 +271,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
-                            android:text="VOLUME (24H) IN USD / EUR. modify programatly" />
+                            android:text="VOLUME (24H) IN USD / EUR. modify programatly"
+                            android:textColor="@color/textColorWhatsOnCrypto" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
-                            android:text="VOLUME (24H) IN BTC. modify programatly" />
+                            android:text="VOLUME (24H) IN BTC. modify programatly"
+                            android:textColor="@color/textColorWhatsOnCrypto" />
 
                     </LinearLayout>
                 </RelativeLayout>
@@ -297,7 +305,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="CIRCULATING SUPLY" />
+                        android:text="CIRCULATING SUPLY"
+                        android:textColor="@android:color/white" />
 
                 </RelativeLayout>
 
@@ -310,7 +319,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="CIRCULATING SUPLY IN BTC" />
+                        android:text="CIRCULATING SUPLY IN BTC"
+                        android:textColor="@color/textColorWhatsOnCrypto" />
 
                 </RelativeLayout>
             </LinearLayout>
@@ -336,7 +346,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="MAX SUPLY" />
+                        android:text="MAX SUPLY"
+                        android:textColor="@android:color/white" />
 
                 </RelativeLayout>
 
@@ -349,7 +360,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="MAX SUPLY IN BTC" />
+                        android:text="MAX SUPLY IN BTC"
+                        android:textColor="@color/textColorWhatsOnCrypto" />
 
                 </RelativeLayout>
             </LinearLayout>
@@ -392,7 +404,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="GO BACK" />
+                        android:text="GO BACK"
+                        android:textColor="@android:color/white" />
 
                 </RelativeLayout>
             </LinearLayout>

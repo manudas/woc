@@ -108,10 +108,11 @@ class CoinMarket : AppCompatActivity() {
         val coin_name_str = coin_name_superstring.substring("details_".length)
         * now the name doesn't contain details_ so we pass the whole string
         */
-        val coin_name_str = decode_string_from_int(id)
-
+        val coin_name_from_str = decode_string_from_int(id)
+        val coin_name_to_str = Companion.SelectedCurrencyTo.name
         val myIntent = Intent(this@CoinMarket, CoinMarketDetails::class.java)
-        myIntent.putExtra("coin_name", coin_name_str) //Optional parameters
+        myIntent.putExtra("coin_from_name", coin_name_from_str) //Optional parameters
+        myIntent.putExtra("coin_to_name", coin_name_to_str) //Optional parameters
         this@CoinMarket.startActivity(myIntent)
     }
 
@@ -170,7 +171,7 @@ class CoinMarket : AppCompatActivity() {
         }
         coin_price_textview.text = price.toString() + " " + SelectedCurrencyTo.symbol
 
-        var percentage_change = conversion_obj.get("CHANGEPCT24HOUR") as Double
+        var percentage_change = conversion_obj.get("CHANGEPCT24HOUR").toString().toDouble()
 
         // rounding to two decimal places
         percentage_change *= 100

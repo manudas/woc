@@ -526,9 +526,41 @@ class CoinMarketModel {
      *
      */
     public fun saveCoinDetails(vararg details: Any?): Any? {
-        val _coinname = details[0]
-        val _detail = (details[1]) as JSONObject?
+        val _coinnameFrom = details[0] as String
+        val _coinnameTo = details[1] as String
+        val _details = (details[2]) as JSONObject?
 
+        val coinFrom = _coinnameFrom.toUpperCase()
+        val coinTo = _coinnameTo.toUpperCase()
+        val coin_index = Companion.mCurrentIndexToArraySymbolMap.get(coinFrom)
+
+        val array_element = Companion.mCurrentCoinList!![coin_index!!]
+        val datamap = array_element[coinFrom] // array_element is a map, being accessed as an array
+        val coinToDataMap = datamap!!.get(coinTo) as MutableMap<Any?, Any?>
+
+        var details_coinToDataMap : SortedMap<Long, in Any?>? = coinToDataMap.get("details") as SortedMap<Long, in Any?>?
+        if (details_coinToDataMap == null) {
+            details_coinToDataMap = hashMapOf<Long, Any?>().toSortedMap()
+            coinToDataMap.put("details", details_coinToDataMap)
+        }
+
+        val _details_data = _details!!.get("Data") as JSONArray
+        for (index in 0 until _details_data.length()){
+            var current_price_detail = _details_data[index] as JSONObject
+
+            val index_Set = current_price_detail!!.keys()
+
+            val priceDataInTime = hashMapOf<Any, Any?>()
+            for (index in index_Set) {
+                val value = current_price_detail.get(index)
+                priceDataInTime.put(index, value)
+            }
+
+            val _time = current_price_detail.get("time").toString()
+            var time: Long? = _time.toLong()
+
+            details_coinToDataMap.put(time, priceDataInTime)
+        }
         return null
     }
 }
