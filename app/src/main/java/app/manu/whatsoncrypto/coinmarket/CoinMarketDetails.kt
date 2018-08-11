@@ -20,27 +20,25 @@ import com.jjoe64.graphview.series.LineGraphSeries
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class CoinMarketDetails : AppCompatActivity() {
-
-    private var _mRootView: ViewGroup? = null
-
-    private val mCoinMarketModel = CoinMarketModel()
 
     private val mHideHandler = Handler()
     private val mHideRunnable = Runnable { hideSystemUI() }
 
+    private val mCoinMarketModel = CoinMarketModel()
+
     private var coinTo : String? = null
     private var coinFrom : String? = null
-
-    private var mCurrentX_axis = mutableMapOf<Long, Date>().toSortedMap()
 
     private var mNumLabels = 4
 
     private var mGranurality = CoinMarketModel.Companion.price_granularity.MINUTE;
 
+    private var mCurrentX_axis = mutableMapOf<Long, Date>().toSortedMap()
+    private var _mRootView: ViewGroup? = null
     private var topBound: Long? = null
     private var bottomBound: Long? = null
+    private var scaleY_factor: Float? = null
 
     private val mGraphColor = Color.argb(80, 255, 255, 255)
 
@@ -119,7 +117,6 @@ class CoinMarketDetails : AppCompatActivity() {
             this.coinTo = coin_to_name.toUpperCase()
             //The key argument here must match that used in the other activity
 
-
             val f_SavePriceDetails : (Any?) -> Any? = { _details: Any? ->
                 mCoinMarketModel.saveCoinDetails(this.coinFrom, this.coinTo, _details)
             }
@@ -136,9 +133,7 @@ class CoinMarketDetails : AppCompatActivity() {
                        f_drawGraph as (Any?) -> Any?,
                        f_setNewLayout
                     )
-
             /* function to call:
-
             mCoinMarketModel::getPriceDetails(coin: String,
                granularity: price_granularity,
                toDate: Date?,
@@ -146,12 +141,12 @@ class CoinMarketDetails : AppCompatActivity() {
                onFinish : List<(Any?) -> Any?> ) {
 
             */
-
             mCoinMarketModel.getPriceDetails(this.coinFrom!!, this.mGranurality , null, null, onFinish_func_array )
-            this.setBounds()
+            // this.setBounds()
             this.setScalable()
+            this.setScrollable()
+            this.setScale(null)
             this.setDateLabelFormatter()
-
         }
         else {
             throw RuntimeException("No coin passed to CoinMarketDetails Activity")
@@ -162,32 +157,80 @@ class CoinMarketDetails : AppCompatActivity() {
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
 
         // enable scaling
-        graphView.getViewport().setScalable(true); // X Axis
+        graphView.viewport.isScalable = true; // X Axis
         // graphView.getViewport().setScalableY(true); // Y Axis
     }
+
+    private fun setScrollable() {
+        val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
+
+        // enable scrollable
+        graphView.viewport.isScrollable = true // X
+        // graphView.getViewport().isScrollableY = true; // Y Axis
+    }
+
     private fun setBounds() {
+        /* UTC:
         val mCalendar = Calendar.getInstance(TimeZone.getTimeZone("utc"))
         val current_utc_millies = mCalendar.timeInMillis
+        */
+        val now = System.currentTimeMillis()
 
-        this.topBound = current_utc_millies
-        this.bottomBound = current_utc_millies - this.mGranurality.time_lapse_in_seconds
+        this.topBound = now
+        val coin = getCoinDetailsMap(this.coinFrom!!)
+        val coin_times = coin!!.keys
+        val lowest_time = coin_times.first() // is a sorted map, so the first is the highest
+        // this.bottomBound = lowest_time*1000
+
+        this.bottomBound = if (this.mGranurality == CoinMarketModel.Companion.price_granularity.MINUTE) {
+            now - (3600*1000) // 1H
+        }
+        else if (this.mGranurality == CoinMarketModel.Companion.price_granularity.HOURLY) {
+            now - (3600*3*1000) // 3H
+        }
+        else {
+            now - (3600*24*3*1000) // 3D for now
+        }
 
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
 
         graphView.viewport.isXAxisBoundsManual = true
         graphView.viewport.isYAxisBoundsManual = false
+        graphView.viewport.setMinX(this.bottomBound!!.toDouble())
+        graphView.viewport.setMaxX(this.topBound!!.toDouble())
+
     }
+
+    private fun setScale(scale: Float?) : Unit {
+        if (scale == null) {
+            this.scaleY_factor =
+                    if (this.mGranurality == CoinMarketModel.Companion.price_granularity.MINUTE) {
+                        60f // 1H
+                    } else if ((this.mGranurality == CoinMarketModel.Companion.price_granularity.HOURLY)) {
+                        60 * 10f // depende de cuanto se dibuje se comprimirá, en principio 10 Horas
+                    } else {
+                        60 * 10 * 4f // depende de cuanto se dibuje se comprimirá, en principio 4 días
+                    }
+        }
+        else {
+            this.scaleY_factor = -scale
+        }
+        val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
+        // graphView.scaleY = this.scaleY_factor!!
+    }
+
     private fun setDateLabelFormatter(){
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
 
         val _format =
                 when (this.mGranurality){
-                    CoinMarketModel.Companion.price_granularity.MINUTE -> "H:m"
-                    CoinMarketModel.Companion.price_granularity.HOURLY -> "Y-m-d H:m"
+                    CoinMarketModel.Companion.price_granularity.MINUTE -> "H:mm"
+                    CoinMarketModel.Companion.price_granularity.HOURLY -> "Y-m-d H:mm"
                     CoinMarketModel.Companion.price_granularity.DAYLY -> "Y-m-d"
                 }
 
         val format = SimpleDateFormat(_format)
+        format.timeZone = TimeZone.getDefault()
 
         // set date label formatter
         graphView.gridLabelRenderer.labelFormatter = DateAsXAxisLabelFormatter(graphView.context, format)
@@ -204,8 +247,7 @@ class CoinMarketDetails : AppCompatActivity() {
         this.prepareX_Axis(_coin)
         // this.setBounds(coin) it is being done in onCreate, and does not need coin parameter
         this.setGraphSeries(_coin)
-
-
+        this.setBounds()
     }
 
     private fun setBackgroundColor() {
@@ -218,21 +260,24 @@ class CoinMarketDetails : AppCompatActivity() {
         // this will convert the Date to double via Date#getTime()
         val series = LineGraphSeries<DataPoint>()
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
+//        graphView.onDataChanged(false, false)
         val coin_price_details = this.getCoinDetailsMap(coin) as Map<Long, Map<String, Any?>>// is a map
         for(index in this.mCurrentX_axis.keys) {
             val element = coin_price_details!![index] as Map<String, Any?>// is a map
             val current_date = this.mCurrentX_axis[index]
+
+
             val higher_price_in_period = element.get("high").toString().toDouble()
             val lower_price_in_period = element.get("low").toString().toDouble()
             val average_price_in_period = (higher_price_in_period + lower_price_in_period) / 2
 
             val point: DataPoint = DataPoint(current_date, average_price_in_period)
-            series.appendData(point,false, mCurrentX_axis.size)
+            series.appendData(point,true, mCurrentX_axis.size)
         }
 
         // val series2 = LineGraphSeries(arrayOf(DataPoint(0.0, 1.0), DataPoint(1.0, 5.0), DataPoint(2.0, 3.0)))
         graphView.addSeries(series)
-        // graphView.addSeries(series2)
+
     }
 
     private fun getCoinDetailsMap(coin: String): SortedMap<Long, Any?>? {
@@ -251,11 +296,12 @@ class CoinMarketDetails : AppCompatActivity() {
     private fun prepareX_Axis(coin: String){
         val details_coinToDataMap = this.getCoinDetailsMap(coin)
         val keys = details_coinToDataMap!!.keys
+        // val offset = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings // UTC to local time
 
         mCurrentX_axis.clear()
 
         for (key : Long in keys) {
-            val date = Date(key)
+            val date = Date((key * 1000)) // from seconds to milliseconds
             val indice = key
             mCurrentX_axis.put(indice, date)
         }
