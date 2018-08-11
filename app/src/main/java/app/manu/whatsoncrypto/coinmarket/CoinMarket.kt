@@ -15,6 +15,7 @@ import android.widget.TextView
 import java.math.BigInteger
 
 import android.content.Intent
+
 import app.manu.whatsoncrypto.coinmarket.CoinMarketDetails
 
 
@@ -138,11 +139,17 @@ class CoinMarket : AppCompatActivity() {
                 break
             }
         }
+        _mRootView!!.setWillNotDraw(false)
         setContentView(_mRootView)
+        _mRootView!!.invalidate()
     }
 
     private fun drawCoin(coin: Map<String, Any>) : Unit {
-        val coin_martket_item_view = LayoutInflater.from(this).inflate(R.layout.coin_market_item, null)
+        val coin_martket_item_view = LayoutInflater.from(this).inflate(R.layout.coin_market_item, _mDataRootView, false)
+        // val current_params = coin_martket_item_view.layoutParams
+
+        // val params = LinearLayout.LayoutParams(this, current_params)
+
         val coin_name_textview : TextView = coin_martket_item_view.findViewById(R.id.coinName)
 
         val coin_logo_textview : TextView = coin_martket_item_view.findViewById(R.id.coinLogo)
