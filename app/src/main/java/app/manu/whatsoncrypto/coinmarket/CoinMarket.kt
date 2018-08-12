@@ -32,12 +32,7 @@ class CoinMarket : AppCompatActivity() {
 
 
     companion object {
-
-        public enum class CURRENCY_TO(val symbol: String) {
-            USD("$"), EUR("€")
-        }
-
-        public var SelectedCurrencyTo: CURRENCY_TO = CURRENCY_TO.USD
+        public var SelectedCurrencyTo: String = "USD"
     }
 
 
@@ -110,7 +105,7 @@ class CoinMarket : AppCompatActivity() {
         * now the name doesn't contain details_ so we pass the whole string
         */
         val coin_name_from_str = decode_string_from_int(id)
-        val coin_name_to_str = Companion.SelectedCurrencyTo.name
+        val coin_name_to_str = Companion.SelectedCurrencyTo
         val myIntent = Intent(this@CoinMarket, CoinMarketDetails::class.java)
         myIntent.putExtra("coin_from_name", coin_name_from_str) //Optional parameters
         myIntent.putExtra("coin_to_name", coin_name_to_str) //Optional parameters
@@ -165,7 +160,7 @@ class CoinMarket : AppCompatActivity() {
         coin_logo_textview.text = coin_font_char
 
         coin_name_textview.text = name
-        val conversion_obj = coin.get(SelectedCurrencyTo.name.toUpperCase()) as Map<String, Any>
+        val conversion_obj = coin.get(SelectedCurrencyTo.toUpperCase()) as Map<String, Any>
         val price_any = conversion_obj.get("PRICE") as Any?
         var price_conv: Any? = null
         var price: Double? = null
@@ -176,7 +171,14 @@ class CoinMarket : AppCompatActivity() {
         else { // Integer
             price = price_any!!.toString().toInt().toDouble()
         }
-        coin_price_textview.text = price.toString() + " " + SelectedCurrencyTo.symbol
+
+        // rounding to three decimal places
+        price *= 1000
+        price = Math.round(price).toDouble()
+        price /= 1000
+
+
+        coin_price_textview.text = price.toString() + " " + CoinMarketModel.getSymbol(SelectedCurrencyTo)
 
         var percentage_change = conversion_obj.get("CHANGEPCT24HOUR").toString().toDouble()
 

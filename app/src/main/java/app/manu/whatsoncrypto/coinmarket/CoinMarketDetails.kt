@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 
 import app.manu.whatsoncrypto.R
 import app.manu.whatsoncrypto.models.CoinMarketModel
@@ -126,12 +127,16 @@ class CoinMarketDetails : AppCompatActivity() {
             val f_setNewLayout: (Any?) -> Any? =  {
                 _details: Any? -> setContentView(_mRootView)
             }
+            val f_setCoinDataInView = {
+                _details: Any? -> setCoinDataInView(this.coinFrom!!)
+            }
 
             val onFinish_func_array =
                     listOf<(Any?) -> Any?>(
                        f_SavePriceDetails as (Any?) -> Any?,
                        f_drawGraph as (Any?) -> Any?,
-                       f_setNewLayout
+                       f_setNewLayout,
+                       f_setCoinDataInView
                     )
             /* function to call:
             mCoinMarketModel::getPriceDetails(coin: String,
@@ -145,12 +150,94 @@ class CoinMarketDetails : AppCompatActivity() {
             // this.setBounds()
             this.setScalable()
             this.setScrollable()
-            this.setScale(null)
+            // this.setScale(null)
             this.setDateLabelFormatter()
         }
         else {
             throw RuntimeException("No coin passed to CoinMarketDetails Activity")
         }
+    }
+
+    private fun setCoinDataInView(coin_name: String) {
+        val coin_logo_textview = _mRootView!!.findViewById(R.id.coin_logo_details) as TextView
+
+        val lowerCoinName = coin_name.toLowerCase()
+        val upperCoinName = coin_name.toUpperCase()
+
+        var coin_font_char = CoinMarketModel.CoinIconMap.get(lowerCoinName)
+        if (coin_font_char == null){
+            coin_font_char = CoinMarketModel.CoinIconMap["?"]
+        }
+        coin_logo_textview.text = coin_font_char
+
+        val coin_name_textview = _mRootView!!.findViewById(R.id.coin_name_details) as TextView
+        coin_name_textview.text = upperCoinName
+
+        val price_details_textview = _mRootView!!.findViewById(R.id.price_details) as TextView
+        val percentage_details_textview = _mRootView!!.findViewById(R.id.percentage_detail) as TextView
+        val coin_details_data_map = this.getCoinDetailsMap(coin_name)
+        val keys = coin_details_data_map!!.keys // sorted map, so last keys are the bigger ones
+
+        var last_average_price: Double = 0.0
+
+        if (keys.size >= 1) {
+            val last_key = keys.last()
+            val last_element = coin_details_data_map.get(last_key) as Map<String, Any?>
+            val last_higher_price_in_period = last_element.get("high").toString().toDouble()
+            val last_lower_price_in_period = last_element.get("low").toString().toDouble()
+            last_average_price = average(last_higher_price_in_period , last_lower_price_in_period)
+
+            var printed_value = last_average_price
+            // rounding to three decimal places
+            printed_value *= 1000
+            printed_value = Math.round(printed_value).toDouble()
+            printed_value /= 1000
+
+            val coinToSymbol = CoinMarketModel.getSymbol(this.coinTo!!)
+            price_details_textview.text = coinToSymbol + " " + printed_value
+        }
+        if (keys.size >= 2) {
+            val last_key = keys.last()
+
+            val view_sub_map = coin_details_data_map.headMap(last_key)
+            val previous_key = view_sub_map.lastKey()
+
+
+            val previous_element = coin_details_data_map.get(previous_key) as Map<String, Any?>
+            val previous_higher_price_in_period = previous_element.get("high").toString().toDouble()
+            val previous_lower_price_in_period = previous_element.get("low").toString().toDouble()
+            val previous_average_price = average(previous_higher_price_in_period , previous_lower_price_in_period)
+
+            var percentage_change = ( (last_average_price-previous_average_price) / last_average_price) * 100
+
+            // rounding to two decimal places
+            percentage_change *= 100
+            percentage_change = Math.round(percentage_change).toDouble()
+            percentage_change /= 100
+
+            percentage_details_textview.text = percentage_change.toString() + "%"
+            if (percentage_change > 0.0) {
+                // green market
+                percentage_details_textview.setTextColor(Color.GREEN)
+            }
+            else {
+                // bearish market
+                percentage_details_textview.setTextColor(Color.RED)
+
+            }
+        }
+
+
+        if (keys.size < 1) {
+            price_details_textview.text = ""
+            percentage_details_textview.text = ""
+        }
+        else if (keys.size < 2) {
+            percentage_details_textview.text = ""
+        }
+
+        val coin_data_map = CoinMarketModel.getCoinMap(this.coinFrom!!)
+coin_data_map!!.size
     }
 
     private fun setScalable() {
@@ -216,7 +303,7 @@ class CoinMarketDetails : AppCompatActivity() {
             this.scaleY_factor = -scale
         }
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
-        // graphView.scaleY = this.scaleY_factor!!
+        graphView.scaleY = this.scaleY_factor!!
     }
 
     private fun setDateLabelFormatter(){
@@ -255,6 +342,10 @@ class CoinMarketDetails : AppCompatActivity() {
         graphView.setBackgroundColor(mGraphColor)
     }
 
+    private fun average(f: Double, f2: Double) : Double {
+        return (f + f2) / 2
+    }
+
     private fun setGraphSeries(coin: String){
         // you can directly pass Date objects to DataPoint-Constructor
         // this will convert the Date to double via Date#getTime()
@@ -269,7 +360,7 @@ class CoinMarketDetails : AppCompatActivity() {
 
             val higher_price_in_period = element.get("high").toString().toDouble()
             val lower_price_in_period = element.get("low").toString().toDouble()
-            val average_price_in_period = (higher_price_in_period + lower_price_in_period) / 2
+            val average_price_in_period = average(higher_price_in_period , lower_price_in_period)
 
             val point: DataPoint = DataPoint(current_date, average_price_in_period)
             series.appendData(point,true, mCurrentX_axis.size)

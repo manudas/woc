@@ -23,6 +23,15 @@ class CoinMarketModel {
             return mCurrentCoinList
         }
 
+        public fun getCoinMap(coin: String): MutableMap<String, out Any?>? {
+            val _coin = coin.toUpperCase()
+            val coin_index = CoinMarketModel.mCurrentIndexToArraySymbolMap.get(_coin)
+
+            val array_element = CoinMarketModel.mCurrentCoinList!![coin_index!!]
+            return array_element
+        }
+
+
         var mCurrentCoinList: SparseArray<MutableMap<String, MutableMap<String, Any>>>? = null
         val mCurrentIndexToArraySymbolMap: MutableMap<String, Int> = hashMapOf<String, Int>()
                 // mutableHashMapOf<String, Int>()
@@ -57,6 +66,21 @@ class CoinMarketModel {
             HOURLY_HISTORICAL("histohour"),
             PRICE("price"),
             DAY_AVERAGE("dayAvg")
+        }
+
+        private val CoinSymbolMap = hashMapOf(
+                "eur" to "€",
+                "usd" to "$"
+        )
+
+        public fun getSymbol(coin_name: String): String {
+            val symbol = CoinSymbolMap.get(coin_name.toLowerCase())
+            if (symbol != null) {
+                return symbol
+            }
+            else {
+                return coin_name.toUpperCase()
+            }
         }
 
         val CoinIconMap = hashMapOf(
@@ -450,7 +474,7 @@ class CoinMarketModel {
      * USED IN ConMarketDetails Activity
      *
      */
-    public fun getPriceDetails(coin: String, granularity: price_granularity, toDate: Date?, destination_currency: CoinMarket.Companion.CURRENCY_TO?, onFinish : List<(Any?) -> Any?> ) {
+    public fun getPriceDetails(coin: String, granularity: price_granularity, toDate: Date?, destination_currency: String?, onFinish : List<(Any?) -> Any?> ) {
 
         val mCalendar = Calendar.getInstance(TimeZone.getTimeZone("utc"))
         val current_utc_millies = mCalendar.timeInMillis
@@ -478,7 +502,7 @@ class CoinMarketModel {
         }
         val time_stamp = millies/1000
 
-        var final_destination_currency: CoinMarket.Companion.CURRENCY_TO? = null
+        var final_destination_currency: String? = null
         if (destination_currency == null){
             final_destination_currency = CoinMarket.Companion.SelectedCurrencyTo
         }
@@ -488,7 +512,7 @@ class CoinMarketModel {
 
         val limit_parameter = "limit=${final_granularity!!.limitApiResults}"
         val coinFromSymbl = "fsym=${coin.toUpperCase()}"
-        val to_currency_parameter = "tsym=${final_destination_currency.name}"
+        val to_currency_parameter = "tsym=${final_destination_currency}"
         val to_timestamp = "toTs=${time_stamp}"
 
         var parameters = "?"

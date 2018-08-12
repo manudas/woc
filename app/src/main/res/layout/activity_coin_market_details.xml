@@ -77,26 +77,34 @@
                 <RelativeLayout
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.25">
+                    android:layout_weight="0.15">
 
                     <TextView
+                        android:id="@+id/coin_logo_details"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:fontFamily="@font/cryptofont_webfont"
                         android:text="LOGO MONEDA"
-                        android:textColor="@color/textColorWhatsOnCrypto" />
+                        android:textColor="@color/textColorWhatsOnCrypto"
+                        android:textSize="@dimen/extra_big_font"
+                        app:fontFamily="@font/cryptofont_webfont" />
 
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.75">
+                    android:layout_weight="0.85">
 
                     <TextView
+                        android:id="@+id/coin_name_details"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="NOMBRE MONEDA"
-                        android:textColor="@android:color/white" />
+                        android:textAllCaps="true"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/big_font"
+                        android:textStyle="bold" />
 
                 </RelativeLayout>
             </LinearLayout>
@@ -111,10 +119,13 @@
             <!-- layout_weight per line 0,0667 -->
 
             <TextView
+                android:id="@+id/price_details"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="PRECIO MONEDA"
-                android:textColor="@color/textColorWhatsOnCrypto" />
+                android:textColor="@color/textColorWhatsOnCrypto"
+                android:textSize="@dimen/extra_big_font"
+                android:textStyle="bold" />
 
         </RelativeLayout>
 
@@ -144,9 +155,11 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:id="@+id/percentage_detail"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="percentage variation" />
+                        android:text="percentage variation"
+                        android:textSize="@dimen/big_font" />
 
                 </RelativeLayout>
 
