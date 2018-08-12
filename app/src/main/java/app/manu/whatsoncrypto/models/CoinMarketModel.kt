@@ -28,7 +28,7 @@ class CoinMarketModel {
             val coin_index = CoinMarketModel.mCurrentIndexToArraySymbolMap.get(_coin)
 
             val array_element = CoinMarketModel.mCurrentCoinList!![coin_index!!]
-            return array_element
+            return array_element.get(_coin)
         }
 
 

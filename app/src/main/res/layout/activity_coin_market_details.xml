@@ -199,13 +199,14 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="start"
                     android:layout_weight="0.3"
-                    android:gravity="start">
+                    android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="MARKET CAP"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/big_font" />
 
                 </RelativeLayout>
 
@@ -218,22 +219,26 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="end"
+                        android:gravity="center|end"
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/market_cap_details_cointo"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
                             android:text="MARKET CAP IN USD / EUR. modify programatly"
-                            android:textColor="@color/textColorWhatsOnCrypto" />
+                            android:textColor="@color/textColorWhatsOnCrypto"
+                            android:textSize="@dimen/standard_font" />
 
                         <TextView
+                            android:id="@+id/market_cap_details_coinfrom"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
                             android:text="MARKET CAP IN BTC. modify programatly"
-                            android:textColor="@color/textColorWhatsOnCrypto" />
+                            android:textColor="@color/textColorWhatsOnCrypto"
+                            android:textSize="@dimen/standard_font" />
 
                     </LinearLayout>
                 </RelativeLayout>
@@ -263,7 +268,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="VOLUME (24H)"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/big_font" />
 
                 </RelativeLayout>
 
@@ -281,18 +287,22 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/volume_24h_details_to"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
                             android:text="VOLUME (24H) IN USD / EUR. modify programatly"
-                            android:textColor="@color/textColorWhatsOnCrypto" />
+                            android:textColor="@color/textColorWhatsOnCrypto"
+                            android:textSize="@dimen/standard_font" />
 
                         <TextView
+                            android:id="@+id/volume_24h_details_from"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="0.5"
                             android:text="VOLUME (24H) IN BTC. modify programatly"
-                            android:textColor="@color/textColorWhatsOnCrypto" />
+                            android:textColor="@color/textColorWhatsOnCrypto"
+                            android:textSize="@dimen/standard_font" />
 
                     </LinearLayout>
                 </RelativeLayout>
@@ -319,7 +329,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="CIRCULATING SUPLY"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/big_font" />
 
                 </RelativeLayout>
 
@@ -330,10 +341,12 @@
                     android:gravity="end">
 
                     <TextView
+                        android:id="@+id/supply_details"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="CIRCULATING SUPLY IN BTC"
-                        android:textColor="@color/textColorWhatsOnCrypto" />
+                        android:textColor="@color/textColorWhatsOnCrypto"
+                        android:textSize="@dimen/standard_font" />
 
                 </RelativeLayout>
             </LinearLayout>
@@ -360,7 +373,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="MAX SUPLY"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/big_font" />
 
                 </RelativeLayout>
 
@@ -371,10 +385,12 @@
                     android:gravity="end">
 
                     <TextView
+                        android:id="@+id/max_supply_details"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="MAX SUPLY IN BTC"
-                        android:textColor="@color/textColorWhatsOnCrypto" />
+                        android:textColor="@color/textColorWhatsOnCrypto"
+                        android:textSize="@dimen/standard_font" />
 
                 </RelativeLayout>
             </LinearLayout>

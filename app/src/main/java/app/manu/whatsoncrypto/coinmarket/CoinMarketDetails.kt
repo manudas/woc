@@ -179,6 +179,8 @@ class CoinMarketDetails : AppCompatActivity() {
         val keys = coin_details_data_map!!.keys // sorted map, so last keys are the bigger ones
 
         var last_average_price: Double = 0.0
+        val coinToSymbol = CoinMarketModel.getSymbol(this.coinTo!!)
+        val coinFromSymbol = CoinMarketModel.getSymbol(this.coinFrom!!)
 
         if (keys.size >= 1) {
             val last_key = keys.last()
@@ -193,7 +195,6 @@ class CoinMarketDetails : AppCompatActivity() {
             printed_value = Math.round(printed_value).toDouble()
             printed_value /= 1000
 
-            val coinToSymbol = CoinMarketModel.getSymbol(this.coinTo!!)
             price_details_textview.text = coinToSymbol + " " + printed_value
         }
         if (keys.size >= 2) {
@@ -237,7 +238,40 @@ class CoinMarketDetails : AppCompatActivity() {
         }
 
         val coin_data_map = CoinMarketModel.getCoinMap(this.coinFrom!!)
-coin_data_map!!.size
+        val coin_to_conversion_map = coin_data_map!!.get(this.coinTo!!.toUpperCase()) as Map <String, Any?>
+
+        var marketCapCoinTo = coin_to_conversion_map["MKTCAP"].toString().toDouble() // map accessed as array
+        val marketCapCoinTo_str = String.format(coinToSymbol+" %,.2f", marketCapCoinTo) // format the number separating by thousand and with two decimals
+
+        val marketCapCoinFrom = marketCapCoinTo / last_average_price
+        val marketCapCoinFrom_str = String.format(coinFromSymbol+" %,.2f", marketCapCoinFrom) // format the number separating by thousand and with two decimals
+
+        val marketCapCoinTo_textview = _mRootView!!.findViewById(R.id.market_cap_details_cointo) as TextView
+        marketCapCoinTo_textview.text = marketCapCoinTo_str
+
+        val marketCapCoinFrom_textview = _mRootView!!.findViewById(R.id.market_cap_details_coinfrom) as TextView
+        marketCapCoinFrom_textview.text = marketCapCoinFrom_str
+
+        var volume24hTo = coin_to_conversion_map["VOLUME24HTO"].toString().toDouble() // map accessed as array
+        val volume24hTo_str = String.format(coinToSymbol+" %,.2f", volume24hTo) // format the number separating by thousand and with two decimals
+        val volume24hTo_textview = _mRootView!!.findViewById(R.id.volume_24h_details_to) as TextView
+        volume24hTo_textview.text = volume24hTo_str
+
+        var volume24hFrom = coin_to_conversion_map["VOLUME24H"].toString().toDouble() // map accessed as array
+        val volume24hFrom_str = String.format(coinFromSymbol+" %,.2f", volume24hFrom) // format the number separating by thousand and with two decimals
+        val volume24hFrom_textview = _mRootView!!.findViewById(R.id.volume_24h_details_from) as TextView
+        volume24hFrom_textview.text = volume24hFrom_str
+
+        var circulating_supply = coin_to_conversion_map["SUPPLY"].toString().toDouble() // map accessed as array
+        val circulating_supply_str = String.format(coinFromSymbol+" %,.2f", circulating_supply) // format the number separating by thousand and with two decimals
+        val circulating_supply_textview = _mRootView!!.findViewById(R.id.supply_details) as TextView
+        circulating_supply_textview.text = circulating_supply_str
+
+        var max_circulating_supply = coin_to_conversion_map["SUPPLY"].toString().toDouble() // map accessed as array
+        val max_circulating_supply_str = String.format(coinFromSymbol+" %,.2f", max_circulating_supply) // format the number separating by thousand and with two decimals
+        val max_circulating_supply_textview = _mRootView!!.findViewById(R.id.max_supply_details) as TextView
+        max_circulating_supply_textview.text = max_circulating_supply_str
+
     }
 
     private fun setScalable() {
