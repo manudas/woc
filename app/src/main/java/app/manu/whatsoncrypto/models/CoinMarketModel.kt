@@ -420,16 +420,19 @@ class CoinMarketModel {
             val values_currency = mutableMapOf<String, Any> ()
 
             for (key_currency in keys_conversionTo) {
-                val valuePriceFull = mutableMapOf<String, Any> ()
+                val valuePriceFull = mutableMapOf<String, Any?> ()
 
                 val priceValueStructure = priceToValues.get(key_currency) as JSONObject
+                saveJSONObject_InMap(valuePriceFull, priceValueStructure)
 
+/*
                 val keys_pricevalueFull = priceValueStructure.keys()
 
                 for (key_pricevalueFull in keys_pricevalueFull){
                     val value_pricevalueFull = priceValueStructure.get(key_pricevalueFull)
                     valuePriceFull.put(key_pricevalueFull, value_pricevalueFull)
                 }
+*/
                 values_currency.put(key_currency, valuePriceFull)
             }
             coinMap.put(coin_name, values_currency)
@@ -572,19 +575,37 @@ class CoinMarketModel {
         for (index in 0 until _details_data.length()){
             var current_price_detail = _details_data[index] as JSONObject
 
-            val index_Set = current_price_detail!!.keys()
+            // val index_Set = current_price_detail!!.keys()
 
-            val priceDataInTime = hashMapOf<Any, Any?>()
+            val priceDataInTime = mutableMapOf<Any, Any?>()
+
+            saveJSONObject_InMap(priceDataInTime, current_price_detail)
+            /*
             for (index in index_Set) {
                 val value = current_price_detail.get(index)
                 priceDataInTime.put(index, value)
             }
-
+            */
             val _time = current_price_detail.get("time").toString()
             var time: Long? = _time.toLong()
 
             details_coinToDataMap.put(time, priceDataInTime)
         }
         return null
+    }
+
+
+    private fun saveJSONObject_InMap(map: MutableMap<out Any, Any?>, json_object: JSONObject): Map<out Any, Any?>? {
+        val index_Set = json_object!!.keys()
+        if (json_object.length() > 0) {
+            for (index in index_Set) {
+                val value = json_object.get(index)
+                (map as MutableMap<Any, Any?>).put(index, value)
+            }
+            return map
+        }
+        else {
+            return null
+        }
     }
 }
