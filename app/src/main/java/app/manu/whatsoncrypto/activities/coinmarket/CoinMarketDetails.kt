@@ -33,7 +33,7 @@ class CoinMarketDetails : AppCompatActivity() {
 
     private var mNumLabels = 4
 
-    private var mGranurality = CoinMarketModel.Companion.price_granularity.MINUTE;
+    private var mGranurality = CoinMarketModel.Companion._api_price_granularity.MINUTE;
 
     private var mCurrentX_axis = mutableMapOf<Long, Date>().toSortedMap()
     private var _mRootView: ViewGroup? = null
@@ -140,7 +140,7 @@ class CoinMarketDetails : AppCompatActivity() {
                     )
             /* function to call:
             mCoinMarketModel::getPriceDetails(coin: String,
-               granularity: price_granularity,
+               granularity: _api_price_granularity,
                toDate: Date?,
                destination_currency: CoinMarket.Companion.CURRENCY_TO?,
                onFinish : List<(Any?) -> Any?> ) {
@@ -237,7 +237,7 @@ class CoinMarketDetails : AppCompatActivity() {
             percentage_details_textview.text = ""
         }
 
-        val coin_data_map = CoinMarketModel.getCoinMap(this.coinFrom!!)
+        val coin_data_map = CoinMarketModel.getCoinData(this.coinFrom!!)
         val coin_to_conversion_map = coin_data_map!!.get(this.coinTo!!.toUpperCase()) as Map <String, Any?>
 
         var marketCapCoinTo = coin_to_conversion_map["MKTCAP"].toString().toDouble() // map accessed as array
@@ -303,10 +303,10 @@ class CoinMarketDetails : AppCompatActivity() {
         val lowest_time = coin_times.first() // is a sorted map, so the first is the highest
         // this.bottomBound = lowest_time*1000
 
-        this.bottomBound = if (this.mGranurality == CoinMarketModel.Companion.price_granularity.MINUTE) {
+        this.bottomBound = if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.MINUTE) {
             now - (3600*1000) // 1H
         }
-        else if (this.mGranurality == CoinMarketModel.Companion.price_granularity.HOURLY) {
+        else if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.HOURLY) {
             now - (3600*3*1000) // 3H
         }
         else {
@@ -325,9 +325,9 @@ class CoinMarketDetails : AppCompatActivity() {
     private fun setScale(scale: Float?) : Unit {
         if (scale == null) {
             this.scaleY_factor =
-                    if (this.mGranurality == CoinMarketModel.Companion.price_granularity.MINUTE) {
+                    if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.MINUTE) {
                         60f // 1H
-                    } else if ((this.mGranurality == CoinMarketModel.Companion.price_granularity.HOURLY)) {
+                    } else if ((this.mGranurality == CoinMarketModel.Companion._api_price_granularity.HOURLY)) {
                         60 * 10f // depende de cuanto se dibuje se comprimirá, en principio 10 Horas
                     } else {
                         60 * 10 * 4f // depende de cuanto se dibuje se comprimirá, en principio 4 días
@@ -345,9 +345,9 @@ class CoinMarketDetails : AppCompatActivity() {
 
         val _format =
                 when (this.mGranurality){
-                    CoinMarketModel.Companion.price_granularity.MINUTE -> "H:mm"
-                    CoinMarketModel.Companion.price_granularity.HOURLY -> "Y-m-d H:mm"
-                    CoinMarketModel.Companion.price_granularity.DAYLY -> "Y-m-d"
+                    CoinMarketModel.Companion._api_price_granularity.MINUTE -> "H:mm"
+                    CoinMarketModel.Companion._api_price_granularity.HOURLY -> "Y-m-d H:mm"
+                    CoinMarketModel.Companion._api_price_granularity.DAILY -> "Y-m-d"
                 }
 
         val format = SimpleDateFormat(_format)

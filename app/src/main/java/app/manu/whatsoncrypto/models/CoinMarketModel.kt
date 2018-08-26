@@ -3,6 +3,7 @@ package app.manu.whatsoncrypto.models
 import android.os.AsyncTask
 import android.util.SparseArray
 import app.manu.whatsoncrypto.CoinMarket
+import app.manu.whatsoncrypto.classes.coin.Coin
 import org.json.JSONObject
 import app.manu.whatsoncrypto.utils.JSON.JSONParser
 import org.json.JSONArray
@@ -19,23 +20,6 @@ class CoinMarketModel {
 
     companion object {
 
-        fun getCoinList() : SparseArray<MutableMap<String, MutableMap<String, Any>>>? {
-            return mCurrentCoinList
-        }
-
-        public fun getCoinMap(coin: String): MutableMap<String, out Any?>? {
-            val _coin = coin.toUpperCase()
-            val coin_index = CoinMarketModel.mCurrentIndexToArraySymbolMap.get(_coin)
-
-            val array_element = CoinMarketModel.mCurrentCoinList!![coin_index!!]
-            return array_element.get(_coin)
-        }
-
-
-        var mCurrentCoinList: SparseArray<MutableMap<String, MutableMap<String, Any>>>? = null
-        val mCurrentIndexToArraySymbolMap: MutableMap<String, Int> = hashMapOf<String, Int>()
-                // mutableHashMapOf<String, Int>()
-
         private val maxResultPerApiCall = 2000
         private val maxApiMinuteResolution : Long = 60 * 24 * 7  // in seconds 60 seconds an hour / 24 hours a day / 7 days
 
@@ -43,14 +27,17 @@ class CoinMarketModel {
          * Enumerator that tells us how much information we need
          * splitted in periods
          */
-        public enum class price_granularity (val action: action, val time_lapse_in_seconds: Int, val limitApiResults: Int){
-            MINUTE(action.MINUTE_HISTORICAL,
+
+
+
+        public enum class _api_price_granularity (val associatedPricePeriod: Coin.Companion.price_period, val action: action, val feched_time_in_seconds_from_api: Int, val limitApiResults: Int){
+            MINUTE(Coin.Companion.price_period.MINUTE, action.MINUTE_HISTORICAL,
                     24 * 60 * 60 /* one day */,
                     1440 /* 1440 minutes per day */),
-            DAYLY(action.DAILY_HISTORICAL,
+            DAILY(Coin.Companion.price_period.DAILY, action.DAILY_HISTORICAL,
                     24 * 30 * 60 * 60 /* one month */,
                     30 /* one result per day as is a daily search */),
-            HOURLY(action.HOURLY_HISTORICAL,
+            HOURLY(Coin.Companion.price_period.HOURLY, action.HOURLY_HISTORICAL,
                     24 * 60 * 60 /* one day */,
                     24 /* one result per hour */)
 
@@ -282,7 +269,7 @@ class CoinMarketModel {
             val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
                 val jParser = JSONParser()
 
-                val coinSymbolArr = mCurrentIndexToArraySymbolMap.keys.toTypedArray()
+                val coinSymbolArr = Coin.getAvailableSymbolList()
 
                 // Getting JSON from URL
                 var coinSymbolStr = coinSymbolArr.joinToString ( separator="," )
@@ -393,8 +380,8 @@ class CoinMarketModel {
         val keys = arr.keys
         for (key in keys) {
             val index_in_coin_list = mCurrentIndexToArraySymbolMap.get(key) as Int
-            val coinSuperMap = mCurrentCoinList!!.get(index_in_coin_list)
-            val coinData = coinSuperMap[key]
+            val coinData = mCurrentCoinList!!.get(index_in_coin_list)
+            //val coinData = coinSuperMap[key]
 
             val values_to_add_to_coin = arr[key]!!
             coinData!!.putAll(values_to_add_to_coin)
@@ -477,7 +464,7 @@ class CoinMarketModel {
      * USED IN ConMarketDetails Activity
      *
      */
-    public fun getPriceDetails(coin: String, granularity: price_granularity, toDate: Date?, destination_currency: String?, onFinish : List<(Any?) -> Any?> ) {
+    public fun getPriceDetails(coin: String, granularityApi: _api_price_granularity, toDate: Date?, destination_currency: String?, onFinish : List<(Any?) -> Any?> ) {
 
         val mCalendar = Calendar.getInstance(TimeZone.getTimeZone("utc"))
         val current_utc_millies = mCalendar.timeInMillis
@@ -490,18 +477,18 @@ class CoinMarketModel {
             millies = toDate.time
         }
 
-        var final_granularity: price_granularity? = null
+        var final_granularityApi: _api_price_granularity? = null
 
-        if ((granularity == price_granularity.MINUTE)
-                && ((millies - price_granularity.MINUTE.time_lapse_in_seconds) > (current_utc_millies - (maxApiMinuteResolution*60)))) {
+        if ((granularityApi == _api_price_granularity.MINUTE)
+                && ((millies - _api_price_granularity.MINUTE.feched_time_in_seconds_from_api) > (current_utc_millies - (maxApiMinuteResolution*60)))) {
 
-            final_granularity = granularity
+            final_granularityApi = granularityApi
             // nothing IMPORTANT to do as is into the allowed minute margin given by the api
             // I do this way instead of inverting greater to minus than for clarity reasons
         }
-        else if (granularity == price_granularity.MINUTE) {
-            // out of api margin, change price granularity to hours
-            final_granularity = price_granularity.HOURLY
+        else if (granularityApi == _api_price_granularity.MINUTE) {
+            // out of api margin, change price granularityApi to hours
+            final_granularityApi = _api_price_granularity.HOURLY
         }
         val time_stamp = millies/1000
 
@@ -513,7 +500,7 @@ class CoinMarketModel {
             final_destination_currency = destination_currency
         }
 
-        val limit_parameter = "limit=${final_granularity!!.limitApiResults}"
+        val limit_parameter = "limit=${final_granularityApi!!.limitApiResults}"
         val coinFromSymbl = "fsym=${coin.toUpperCase()}"
         val to_currency_parameter = "tsym=${final_destination_currency}"
         val to_timestamp = "toTs=${time_stamp}"
@@ -525,7 +512,7 @@ class CoinMarketModel {
         if (parameters != "" && to_currency_parameter != "") parameters += "&${to_currency_parameter}" else parameters += to_currency_parameter
 
 
-        val url = _coinAPI_BaseUrl + granularity.action.path + parameters
+        val url = _coinAPI_BaseUrl + granularityApi.action.path + parameters
 
 
         val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
