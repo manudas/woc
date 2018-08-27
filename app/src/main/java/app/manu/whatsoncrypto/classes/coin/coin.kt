@@ -3,7 +3,7 @@ package app.manu.whatsoncrypto.classes.coin
 import android.util.SparseArray
 import java.util.*
 
-class Coin (name: String?, symbol: String?) {
+class Coin (name: String?) {
 
     companion object {
         enum class price_period(val time_lapse_in_seconds: Int) {
@@ -30,7 +30,7 @@ class Coin (name: String?, symbol: String?) {
                 result = sortedCoinList.get(coin_index)
             }
             else {
-                result = Coin(null, _coin)
+                result = Coin( _coin )
 
             }
             return result!!
@@ -60,13 +60,6 @@ class Coin (name: String?, symbol: String?) {
             }
         }
 
-    var symbol = symbol
-        get() = this.symbol
-        set(value: String?) {
-            if (this.symbol == null){
-                field = value
-            }
-        }
 
     public val lastPrice: MutableMap <String, Double> = mutableMapOf<String, Double>() // USD, EUR and so on
 

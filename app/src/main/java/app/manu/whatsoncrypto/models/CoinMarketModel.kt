@@ -308,60 +308,41 @@ class CoinMarketModel {
      * by volume, that we previously got from the API
      * in form of JSON
      *
-     * USED IN ConMarket Activity
+     * USED IN CoinMarket Activity
      *
      */
-    public fun cacheCoinList(json_query_result: JSONObject?) {
-        var arr = jsonCoinByVolumeAsArray(json_query_result)
-        mCurrentIndexToArraySymbolMap.clear()
-
-        for (i in 0 until arr.size()){
-            val key = arr.keyAt(i)
-            val map = arr.get(key)
-            val symbol = map.keys.elementAt(0)
-            mCurrentIndexToArraySymbolMap.put(symbol, key)
+    public fun cacheCoinList(json_query_result: JSONObject?, update: Boolean = false) {
+        var arr = jsonCoinByVolumeAsSortedCoinArray(json_query_result)
+        if (!update) {
+            Coin.sortedCoinList.clear()
         }
-
-        mCurrentCoinList = arr
+        for(i in 0 until arr.size()) {
+            val real_index = arr.keyAt(i)
+            Coin.sortedCoinList.put(real_index, arr[real_index])
+            Coin.setCoinIndex(arr[real_index].name!!, real_index)
+        }
     }
-
     /**
      * Returns the list of most traded coins by volume, that
      * we previously got from the API in form of JSON, and
      * returns it in an array.
      *
-     * USED IN ConMarket Activity
+     * USED IN CoinMarket Activity
      *
      */
-    private fun jsonCoinByVolumeAsArray(json_query_result: JSONObject?) : SparseArray<MutableMap<String, MutableMap<String, Any>>> {
+    private fun jsonCoinByVolumeAsSortedCoinArray(json_query_result: JSONObject?) : SparseArray<Coin> {
         val data = json_query_result!!.get("Data") as JSONArray
-        val sparse_result = SparseArray<MutableMap<String, MutableMap<String, Any>>>()
-
+        val sparse_result = SparseArray<Coin>()
         for (i in 0 until data.length()) {
-            val coin = data[i] as JSONObject
-            val coinInfo = coin.get("CoinInfo") as JSONObject
-
-            val keys_coininfo = coinInfo.keys()
-
-            val values = mutableMapOf<String, Any> ()
-
-            for (key in keys_coininfo) {
-                values.put(key, coinInfo.get(key))
+            val coinJSON_obj = data[i] as JSONObject
+            val coinInfo = coinJSON_obj.get("CoinInfo") as JSONObject
+            val name = coinInfo.get("Name") as String
+            val fullName = coinInfo.get("FullName") as String
+            val coin = Coin.getCoinBySymbol(name)
+            if (coin.fullName == null) {
+                coin.fullName = fullName
             }
-
-            val conversionInfo = coin.get("ConversionInfo") as JSONObject
-
-            val keys_conversionInfo = conversionInfo.keys()
-
-
-            for (key in keys_conversionInfo) {
-                values.put(key, conversionInfo.get(key))
-            }
-
-            val map = hashMapOf(
-                    values.get("Name")!! as String to values
-            )
-            sparse_result.put(i, map)
+            sparse_result.put(i, coin)
         }
         return sparse_result
     }
