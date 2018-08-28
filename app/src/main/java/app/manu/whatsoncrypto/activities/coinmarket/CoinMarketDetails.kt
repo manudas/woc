@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import app.manu.whatsoncrypto.R
+import app.manu.whatsoncrypto.classes.coin.Coin
 import app.manu.whatsoncrypto.models.CoinMarketModel
 import com.jjoe64.graphview.GraphView
 
@@ -164,9 +165,9 @@ class CoinMarketDetails : AppCompatActivity() {
         val lowerCoinName = coin_name.toLowerCase()
         val upperCoinName = coin_name.toUpperCase()
 
-        var coin_font_char = CoinMarketModel.CoinIconMap.get(lowerCoinName)
+        var coin_font_char = Coin.CoinIconMap.get(lowerCoinName)
         if (coin_font_char == null){
-            coin_font_char = CoinMarketModel.CoinIconMap["?"]
+            coin_font_char = Coin.CoinIconMap["?"]
         }
         coin_logo_textview.text = coin_font_char
 
@@ -179,17 +180,26 @@ class CoinMarketDetails : AppCompatActivity() {
         val keys = coin_details_data_map!!.keys // sorted map, so last keys are the bigger ones
 
         var last_average_price: Double = 0.0
-        val coinToSymbol = CoinMarketModel.getSymbol(this.coinTo!!)
-        val coinFromSymbol = CoinMarketModel.getSymbol(this.coinFrom!!)
+        val coinToSymbol = Coin.getSymbol(this.coinTo!!)
+        val coinFromSymbol = Coin.getSymbol(this.coinFrom!!)
 
         if (keys.size >= 1) {
             val last_key = keys.last()
             val last_element = coin_details_data_map.get(last_key) as Map<String, Any?>
-            val last_higher_price_in_period = last_element.get("high").toString().toDouble()
-            val last_lower_price_in_period = last_element.get("low").toString().toDouble()
-            last_average_price = average(last_higher_price_in_period , last_lower_price_in_period)
 
-            var printed_value = last_average_price
+            var printed_value: Double? = null
+            val price = last_element.get("max").toString().toDoubleOrNull()
+
+            if (price == null) {
+                val last_higher_price_in_period = last_element.get("max").toString().toDouble()
+                val last_lower_price_in_period = last_element.get("min").toString().toDouble()
+                last_average_price = average(last_higher_price_in_period, last_lower_price_in_period)
+
+                printed_value = last_average_price
+            }
+            else {
+                printed_value = price
+            }
             // rounding to three decimal places
             printed_value *= 1000
             printed_value = Math.round(printed_value).toDouble()
@@ -202,7 +212,6 @@ class CoinMarketDetails : AppCompatActivity() {
 
             val view_sub_map = coin_details_data_map.headMap(last_key)
             val previous_key = view_sub_map.lastKey()
-
 
             val previous_element = coin_details_data_map.get(previous_key) as Map<String, Any?>
             val previous_higher_price_in_period = previous_element.get("high").toString().toDouble()

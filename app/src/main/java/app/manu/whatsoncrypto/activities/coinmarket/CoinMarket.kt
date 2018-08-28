@@ -15,6 +15,7 @@ import android.widget.TextView
 import java.math.BigInteger
 
 import android.content.Intent
+import app.manu.whatsoncrypto.classes.coin.Coin
 
 import app.manu.whatsoncrypto.coinmarket.CoinMarketDetails
 
@@ -34,7 +35,6 @@ class CoinMarket : AppCompatActivity() {
     companion object {
         public var SelectedCurrencyTo: String = "USD"
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,14 +74,12 @@ class CoinMarket : AppCompatActivity() {
     }
 
     private fun assingDetailsClickEvent(unused: Any?){
-        val coinList = CoinMarketModel.getCoinList()
+        val coinList = Coin.sortedCoinList
         val keyLenght = coinList!!.size()
         for ( i in 0 until keyLenght){
             var real_key = coinList.keyAt(i)
-            val coin_map = coinList.get(real_key)
-            val coin= coin_map
-            val coin_symbol = coin!!.keys.first()
-            // val name = coin.get("Name") as String?
+            val coin : Coin = coinList.get(real_key)
+            val coin_symbol = coin.name
             val _details_id = this.codify_string_as_int(coin_symbol!!.toLowerCase())
 
             val imageView : View = _mDataRootView!!.findViewById(_details_id)
@@ -113,7 +111,7 @@ class CoinMarket : AppCompatActivity() {
     }
 
     private fun drawCoinList(unused: Any?) {
-        val data = CoinMarketModel.getCoinList()
+        val data = Coin.sortedCoinList
 
         if (_mDataRootView!!.measuredHeight <= 0) {
             val specWidth = View.MeasureSpec.makeMeasureSpec(0 /* any */, View.MeasureSpec.UNSPECIFIED)
@@ -125,12 +123,11 @@ class CoinMarket : AppCompatActivity() {
 
         for( i in 0 until data!!.size()) {
             val index = data.keyAt(i)
-            val coin_map = data.get(index)
-            val coin= coin_map
-            val coin_symbol = coin!!.keys.first()
-            this.drawCoin(coin.get(coin_symbol)!!)
+            val coin = data.get(index)
+            // val coin_symbol = coin.name
+            this.drawCoin(coin)
 
-            if (_mCoinListCurrentPage*_mCoinLimitByPage + index >= (_mCoinListCurrentPage+1)*_mCoinLimitByPage) {
+            if (_mCoinListCurrentPage *_mCoinLimitByPage + index >= (_mCoinListCurrentPage + 1) *_mCoinLimitByPage) {
                 break
             }
         }
@@ -139,11 +136,8 @@ class CoinMarket : AppCompatActivity() {
         _mRootView!!.invalidate()
     }
 
-    private fun drawCoin(coin: Map<String, Any>) : Unit {
+    private fun drawCoin(coin: Coin) : Unit {
         val coin_martket_item_view = LayoutInflater.from(this).inflate(R.layout.coin_market_item, _mDataRootView, false)
-        // val current_params = coin_martket_item_view.layoutParams
-
-        // val params = LinearLayout.LayoutParams(this, current_params)
 
         val coin_name_textview : TextView = coin_martket_item_view.findViewById(R.id.coinName)
 
@@ -151,36 +145,36 @@ class CoinMarket : AppCompatActivity() {
         val coin_price_textview : TextView = coin_martket_item_view.findViewById(R.id.price)
         val coin_evolutionPercentage_textview : TextView = coin_martket_item_view.findViewById(R.id.evolutionPercentage)
 
-        val name = coin.get("Name") as String?
+        val name = coin.name
 
-        var coin_font_char = CoinMarketModel.CoinIconMap[name!!.toLowerCase()]
+        var coin_font_char = Coin.CoinIconMap[name!!.toLowerCase()]
         if (coin_font_char == null){
-            coin_font_char = CoinMarketModel.CoinIconMap["?"]
+            coin_font_char = Coin.CoinIconMap["?"]
         }
+
         coin_logo_textview.text = coin_font_char
-
         coin_name_textview.text = name
-        val conversion_obj = coin.get(SelectedCurrencyTo.toUpperCase()) as Map<String, Any>
-        val price_any = conversion_obj.get("PRICE") as Any?
-        var price_conv: Any? = null
-        var price: Double? = null
-        price_conv = price_any!!.toString().toDoubleOrNull()
-        if (price_conv != null) {
-            price = price_conv
-        }
-        else { // Integer
-            price = price_any!!.toString().toInt().toDouble()
-        }
-
-        // rounding to three decimal places
-        price *= 1000
-        price = Math.round(price).toDouble()
-        price /= 1000
 
 
-        coin_price_textview.text = price.toString() + " " + CoinMarketModel.getSymbol(SelectedCurrencyTo)
+        /* INFORMATION THAT IS SUPPOSED TO BE STORED IN dataPriceMap
+         * (some could not come or come empty or null):
+         *
+            dataPriceMap["time"] = time
+            dataPriceMap["max"] = max
+            dataPriceMap["min"] = min
+            dataPriceMap["price"] = current_price
+            dataPriceMap["open"] = open
+            dataPriceMap["supply"] = supply
+            dataPriceMap["volume"] = volume
+         *
+         */
 
-        var percentage_change = conversion_obj.get("CHANGEPCT24HOUR").toString().toDouble()
+        val price = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "price") as Double
+
+        coin_price_textview.text = price.toString() + " " + Coin.getSymbol(SelectedCurrencyTo)
+
+        val open = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "open") as Double
+        var percentage_change = 100 - ( open * 100 / price)
 
         // rounding to two decimal places
         percentage_change *= 100
@@ -199,7 +193,6 @@ class CoinMarket : AppCompatActivity() {
     private fun codify_string_as_int(str: String): Int {
         // convert to integer
         val bigInt = BigInteger(str.toByteArray())
-        // str.toInt()
         return bigInt.toInt()
     }
 

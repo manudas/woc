@@ -55,112 +55,6 @@ class CoinMarketModel {
             DAY_AVERAGE("dayAvg")
         }
 
-        private val CoinSymbolMap = hashMapOf(
-                "eur" to "€",
-                "usd" to "$"
-        )
-
-        public fun getSymbol(coin_name: String): String {
-            val symbol = CoinSymbolMap.get(coin_name.toLowerCase())
-            if (symbol != null) {
-                return symbol
-            }
-            else {
-                return coin_name.toUpperCase()
-            }
-        }
-
-        val CoinIconMap = hashMapOf(
-                "adc" to "\uf000",
-                "aeon" to "\uf001",
-                "amp" to "\uf002",
-                "anc" to "\uf003",
-                "ardr" to "\uf004",
-                "aur" to "\uf005",
-                "bay" to "\uf006",
-                "bcn" to "\uf007",
-                "brk" to "\uf008",
-                "brx" to "\uf009",
-                "bsd" to "\uf00a",
-                "bta" to "\uf00b",
-                "btc" to "\uf00c",
-                "btc-alt" to "\uf00d",
-                "btcd" to "\uf00e",
-                "bts" to "\uf00f",
-                "clam" to "\uf010",
-                "cloak" to "\uf011",
-                "dash" to "\uf012",
-                "dcr" to "\uf013",
-                "dgb" to "\uf014",
-                "dgd" to "\uf015",
-                "dgx" to "\uf016",
-                "dmd" to "\uf017",
-                "doge" to "\uf018",
-                "emc" to "\uf019",
-                "erc" to "\uf01a",
-                "etc" to "\uf01b",
-                "eth" to "\uf01c",
-                "fct" to "\uf01d",
-                "flo" to "\uf01e",
-                "frk" to "\uf01f",
-                "ftc" to "\uf020",
-                "game" to "\uf021",
-                "gld" to "\uf022",
-                "gnt" to "\uf023",
-                "grc" to "\uf024",
-                "grs" to "\uf025",
-                "heat" to "\uf026",
-                "icn" to "\uf027",
-                "ifc" to "\uf028",
-                "incnt" to "\uf029",
-                "ioc" to "\uf02a",
-                "kmd" to "\uf02b",
-                "kobo" to "\uf02c",
-                "kore" to "\uf02d",
-                "lbc" to "\uf02e",
-                "ldoge" to "\uf02f",
-                "lsk" to "\uf030",
-                "ltc" to "\uf031",
-                "maid" to "\uf032",
-                "mint" to "\uf033",
-                "mona" to "\uf034",
-                "mue" to "\uf035",
-                "neos" to "\uf036",
-                "nlg" to "\uf037",
-                "nmc" to "\uf038",
-                "note" to "\uf039",
-                "nuc" to "\uf03a",
-                "nxt" to "\uf03b",
-                "ok" to "\uf03c",
-                "omni" to "\uf03d",
-                "pink" to "\uf03e",
-                "pivx" to "\uf03f",
-                "pot" to "\uf040",
-                "ppc" to "\uf041",
-                "qrk" to "\uf042",
-                "rby" to "\uf043",
-                "rdd" to "\uf044",
-                "rep" to "\uf045",
-                "rise" to "\uf046",
-                "sjcx" to "\uf047",
-                "sls" to "\uf048",
-                "steem" to "\uf049",
-                "strat" to "\uf04a",
-                "sys" to "\uf04b",
-                "trig" to "\uf04c",
-                "ubq" to "\uf04d",
-                "unity" to "\uf04e",
-                "usdt" to "\uf04f",
-                "vrc" to "\uf050",
-                "vtc" to "\uf051",
-                "waves" to "\uf052",
-                "xcp" to "\uf053",
-                "xem" to "\uf054",
-                "xmr" to "\uf055",
-                "xrp" to "\uf056",
-                "zec" to "\uf057",
-                "?" to "\ufffd"
-        )
     }
     init {
         _coinAPI_BaseUrl = "https://min-api.cryptocompare.com/data/"
@@ -355,88 +249,61 @@ class CoinMarketModel {
      * USED IN ConMarket Activity
      *
      */
-    public fun cacheCoinDetailsList(json_query_result: JSONObject?) : SparseArray<MutableMap<String, MutableMap<String, Any>>>? {
-        var arr = jsonCoinDetailsByVolumeAsMap(json_query_result)
-
-        val keys = arr.keys
-        for (key in keys) {
-            val index_in_coin_list = mCurrentIndexToArraySymbolMap.get(key) as Int
-            val coinData = mCurrentCoinList!!.get(index_in_coin_list)
-            //val coinData = coinSuperMap[key]
-
-            val values_to_add_to_coin = arr[key]!!
-            coinData!!.putAll(values_to_add_to_coin)
-        }
-        return mCurrentCoinList
+    public fun cacheCoinDetailsList(json_query_result: JSONObject?) : Map<String, Coin> {
+        return jsonCoinDetailsByVolumeAsMap(json_query_result)
     }
 
     /**
-     * Returns the details used in ConMarket Activity as a Map
+     * Saves the details used in CoinMarket Activity as a Map
+     * Used to fetch the looked for data from the cryptocompare
+     * API, saving it into a Coin object
+     *
+     * IN USE IN: CoinMarket activity as an auxiliary function
      */
-    private fun jsonCoinDetailsByVolumeAsMap(json_query_result: JSONObject?) : MutableMap<String, Map<String, Any>> {
+    private fun jsonCoinDetailsByVolumeAsMap(json_query_result: JSONObject?) : MutableMap<String, Coin> {
         val data = json_query_result!!.get("RAW") as JSONObject
 
         val keys = data.keys()
-
-        val coinMap = mutableMapOf<String, Map<String, Any>> ()
+        val result = mutableMapOf<String, Coin>()
 
         for (coin_name in keys){
+            val coin = Coin.getCoinBySymbol(coin_name)
             val priceToValues = data.get(coin_name) as JSONObject
 
             val keys_conversionTo = priceToValues.keys()
 
-            val values_currency = mutableMapOf<String, Any> ()
-
             for (key_currency in keys_conversionTo) {
-                val valuePriceFull = mutableMapOf<String, Any?> ()
 
                 val priceValueStructure = priceToValues.get(key_currency) as JSONObject
-                saveJSONObject_InMap(valuePriceFull, priceValueStructure)
+                val time = priceValueStructure.get("LASTUPDATE")
+                val max =  priceValueStructure.get("HIGH24HOUR")
+                val min =  priceValueStructure.get("LOW24HOUR")
+                val current_price = priceValueStructure.get("PRICE")
+                val open = priceValueStructure.get("OPEN24HOUR")
+                val supply = priceValueStructure.get("SUPPLY")
+                val volume = priceValueStructure.get("VOLUME24HOUR")
 
-/*
-                val keys_pricevalueFull = priceValueStructure.keys()
+                val dataPriceMap: MutableMap<String, Any?> = mutableMapOf()
+                dataPriceMap["time"] = time
+                dataPriceMap["max"] = max
+                dataPriceMap["min"] = min
+                dataPriceMap["price"] = current_price
+                dataPriceMap["open"] = open
+                dataPriceMap["supply"] = supply
+                dataPriceMap["volume"] = volume
 
-                for (key_pricevalueFull in keys_pricevalueFull){
-                    val value_pricevalueFull = priceValueStructure.get(key_pricevalueFull)
-                    valuePriceFull.put(key_pricevalueFull, value_pricevalueFull)
+                coin.addHistorical(coin_name, dataPriceMap)
+
+                if (current_price != null) {
+                    // ARREGLAR ESTO coin.lastPrice = current_price
                 }
-*/
-                values_currency.put(key_currency, valuePriceFull)
             }
-            coinMap.put(coin_name, values_currency)
+            result.put(coin_name, coin)
         }
-        return coinMap
+        return result
     }
 
-    /**
-     * Returns the list of coins given by the API
-     * as a JSON converted in an SparseArray
-     * 
-     * USED IN: not used at the moment, to be used
-     * just in case in conjunction with getCoinList
-     * 
-     */
-    private fun jsonAllCoinAsArray(json_query_result: JSONObject?) : SparseArray<Map<String, Map<String, Any>>> {
-        val data = json_query_result!!.get("Data") as JSONObject
-        val sparse_result = SparseArray<Map<String, Map<String, Any>>>()
 
-        val keys = data.keys()
-        for ((index, coin_key) in keys.withIndex()) {
-            val coin = data.get(coin_key) as JSONObject
-            val name = coin.get("Name") as String
-            val symbol = coin.get("Symbol") as String
-            val order = (coin.get("SortOrder") as String).toInt()
-
-            val map = hashMapOf(
-                    name to hashMapOf(
-                            "name" to name,
-                            "symbol" to symbol
-                    )
-            )
-            sparse_result.put(order, map)
-        }
-        return sparse_result
-    }
 
     /**
      * Asks the API for the PRICE details of the 
@@ -527,53 +394,47 @@ class CoinMarketModel {
 
         val coinFrom = _coinnameFrom.toUpperCase()
         val coinTo = _coinnameTo.toUpperCase()
-        val coin_index = Companion.mCurrentIndexToArraySymbolMap.get(coinFrom)
 
-        val array_element = Companion.mCurrentCoinList!![coin_index!!]
-        val datamap = array_element[coinFrom] // array_element is a map, being accessed as an array
-        val coinToDataMap = datamap!!.get(coinTo) as MutableMap<Any?, Any?>
-
-        var details_coinToDataMap : SortedMap<Long, in Any?>? = coinToDataMap.get("details") as SortedMap<Long, in Any?>?
-        if (details_coinToDataMap == null) {
-            details_coinToDataMap = hashMapOf<Long, Any?>().toSortedMap()
-            coinToDataMap.put("details", details_coinToDataMap)
-        }
+        val coin = Coin.getCoinData(coinFrom)
 
         val _details_data = _details!!.get("Data") as JSONArray
+
         for (index in 0 until _details_data.length()){
             var current_price_detail = _details_data[index] as JSONObject
+            val time = current_price_detail.get("time").toString().toLong()
 
-            // val index_Set = current_price_detail!!.keys()
+            val priceDataInTime = mutableMapOf<String, Any?>()
+            priceDataInTime["time"] = time
 
-            val priceDataInTime = mutableMapOf<Any, Any?>()
 
-            saveJSONObject_InMap(priceDataInTime, current_price_detail)
-            /*
-            for (index in index_Set) {
-                val value = current_price_detail.get(index)
-                priceDataInTime.put(index, value)
-            }
-            */
-            val _time = current_price_detail.get("time").toString()
-            var time: Long? = _time.toLong()
+            /* this is the data we get from the API:
 
-            details_coinToDataMap.put(time, priceDataInTime)
+                "time":1535480640,
+                "close":7070.58,
+                "high":7071,
+                "low":7070.07,
+                "open":7070.36,
+                "volumefrom":12.71,
+                "volumeto":89721.14 // VOLUME IN THE coinTo currency
+
+             */
+
+            val max = current_price_detail.get("high").toString().toDouble()
+            val min = current_price_detail.get("low").toString().toDouble()
+            val current_price = current_price_detail.get("close").toString().toDouble()
+            val open = current_price_detail.get("open").toString().toDouble()
+            val volume = current_price_detail.get("open").toString().toDouble()
+
+            priceDataInTime["time"] = time
+            priceDataInTime["max"] = max
+            priceDataInTime["min"] = min
+            priceDataInTime["price"] = current_price
+            priceDataInTime["open"] = open
+            priceDataInTime["supply"] = null
+            priceDataInTime["volume"] = volume
+
+            coin!!.addHistorical(coinTo, priceDataInTime)
         }
         return null
-    }
-
-
-    private fun saveJSONObject_InMap(map: MutableMap<out Any, Any?>, json_object: JSONObject): Map<out Any, Any?>? {
-        val index_Set = json_object!!.keys()
-        if (json_object.length() > 0) {
-            for (index in index_Set) {
-                val value = json_object.get(index)
-                (map as MutableMap<Any, Any?>).put(index, value)
-            }
-            return map
-        }
-        else {
-            return null
-        }
     }
 }
