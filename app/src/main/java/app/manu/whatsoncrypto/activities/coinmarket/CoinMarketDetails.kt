@@ -176,50 +176,21 @@ class CoinMarketDetails : AppCompatActivity() {
 
         val price_details_textview = _mRootView!!.findViewById(R.id.price_details) as TextView
         val percentage_details_textview = _mRootView!!.findViewById(R.id.percentage_detail) as TextView
-        val coin_details_data_map = this.getCoinDetailsMap(coin_name)
-        val keys = coin_details_data_map!!.keys // sorted map, so last keys are the bigger ones
 
-        var last_average_price: Double = 0.0
+        val coin = Coin.getCoinData(coin_name)
+
         val coinToSymbol = Coin.getSymbol(this.coinTo!!)
         val coinFromSymbol = Coin.getSymbol(this.coinFrom!!)
 
-        if (keys.size >= 1) {
-            val last_key = keys.last()
-            val last_element = coin_details_data_map.get(last_key) as Map<String, Any?>
+        val price = coin!!.getValueFromHistorical(coinToSymbol, null, "price") as Double
 
-            var printed_value: Double? = null
-            val price = last_element.get("max").toString().toDoubleOrNull()
-
-            if (price == null) {
-                val last_higher_price_in_period = last_element.get("max").toString().toDouble()
-                val last_lower_price_in_period = last_element.get("min").toString().toDouble()
-                last_average_price = average(last_higher_price_in_period, last_lower_price_in_period)
-
-                printed_value = last_average_price
-            }
-            else {
-                printed_value = price
-            }
-            // rounding to three decimal places
-            printed_value *= 1000
-            printed_value = Math.round(printed_value).toDouble()
-            printed_value /= 1000
-
-            price_details_textview.text = coinToSymbol + " " + printed_value
+        if (price != null) {
+            price_details_textview.text = coinToSymbol + " " + price
         }
-        if (keys.size >= 2) {
-            val last_key = keys.last()
+        val open = coin!!.getValueFromHistorical(coinToSymbol, null, "open") as Double
+        if (open != null && price != null) {
 
-            val view_sub_map = coin_details_data_map.headMap(last_key)
-            val previous_key = view_sub_map.lastKey()
-
-            val previous_element = coin_details_data_map.get(previous_key) as Map<String, Any?>
-            val previous_higher_price_in_period = previous_element.get("high").toString().toDouble()
-            val previous_lower_price_in_period = previous_element.get("low").toString().toDouble()
-            val previous_average_price = average(previous_higher_price_in_period , previous_lower_price_in_period)
-
-            var percentage_change = ( (last_average_price-previous_average_price) / last_average_price) * 100
-
+            var percentage_change = 100 - ( open * 100 / price)
             // rounding to two decimal places
             percentage_change *= 100
             percentage_change = Math.round(percentage_change).toDouble()
@@ -233,33 +204,40 @@ class CoinMarketDetails : AppCompatActivity() {
             else {
                 // bearish market
                 percentage_details_textview.setTextColor(Color.RED)
-
             }
         }
 
-
-        if (keys.size < 1) {
+        if (price == null) {
             price_details_textview.text = ""
             percentage_details_textview.text = ""
         }
-        else if (keys.size < 2) {
+        if (price == null || open == null) {
             percentage_details_textview.text = ""
         }
 
-        val coin_data_map = CoinMarketModel.getCoinData(this.coinFrom!!)
-        val coin_to_conversion_map = coin_data_map!!.get(this.coinTo!!.toUpperCase()) as Map <String, Any?>
 
-        var marketCapCoinTo = coin_to_conversion_map["MKTCAP"].toString().toDouble() // map accessed as array
+        val supply = coin.getLastValueFromHistorical( coinToSymbol, "supply" ) as Double
+
+        val marketCapCoinTo = supply * price
+
         val marketCapCoinTo_str = String.format(coinToSymbol+" %,.2f", marketCapCoinTo) // format the number separating by thousand and with two decimals
 
-        val marketCapCoinFrom = marketCapCoinTo / last_average_price
-        val marketCapCoinFrom_str = String.format(coinFromSymbol+" %,.2f", marketCapCoinFrom) // format the number separating by thousand and with two decimals
+        val marketCapCoinFrom_str = String.format(coinFromSymbol+" %,.2f", supply) // format the number separating by thousand and with two decimals
 
         val marketCapCoinTo_textview = _mRootView!!.findViewById(R.id.market_cap_details_cointo) as TextView
         marketCapCoinTo_textview.text = marketCapCoinTo_str
 
         val marketCapCoinFrom_textview = _mRootView!!.findViewById(R.id.market_cap_details_coinfrom) as TextView
         marketCapCoinFrom_textview.text = marketCapCoinFrom_str
+
+
+
+
+        como conseguir esa info ?mmmmmm as the volume I have depends on the period I cant look for the last one
+        becase that would give an erroneus result. So or I aggregate 24 hours or I make some sort of search
+        for a time stamp which is marked as period.DAYLY
+
+
 
         var volume24hTo = coin_to_conversion_map["VOLUME24HTO"].toString().toDouble() // map accessed as array
         val volume24hTo_str = String.format(coinToSymbol+" %,.2f", volume24hTo) // format the number separating by thousand and with two decimals
@@ -271,15 +249,12 @@ class CoinMarketDetails : AppCompatActivity() {
         val volume24hFrom_textview = _mRootView!!.findViewById(R.id.volume_24h_details_from) as TextView
         volume24hFrom_textview.text = volume24hFrom_str
 
-        var circulating_supply = coin_to_conversion_map["SUPPLY"].toString().toDouble() // map accessed as array
-        val circulating_supply_str = String.format(coinFromSymbol+" %,.2f", circulating_supply) // format the number separating by thousand and with two decimals
+        val circulating_supply_str = String.format(coinFromSymbol+" %,.2f", supply) // format the number separating by thousand and with two decimals
         val circulating_supply_textview = _mRootView!!.findViewById(R.id.supply_details) as TextView
         circulating_supply_textview.text = circulating_supply_str
 
-        var max_circulating_supply = coin_to_conversion_map["SUPPLY"].toString().toDouble() // map accessed as array
-        val max_circulating_supply_str = String.format(coinFromSymbol+" %,.2f", max_circulating_supply) // format the number separating by thousand and with two decimals
         val max_circulating_supply_textview = _mRootView!!.findViewById(R.id.max_supply_details) as TextView
-        max_circulating_supply_textview.text = max_circulating_supply_str
+        max_circulating_supply_textview.text = ""
 
     }
 
@@ -366,7 +341,7 @@ class CoinMarketDetails : AppCompatActivity() {
         graphView.gridLabelRenderer.labelFormatter = DateAsXAxisLabelFormatter(graphView.context, format)
         graphView.gridLabelRenderer.numHorizontalLabels = mNumLabels
         // as we use dates as labels, the human rounding to nice readable numbers
-        // is not nessecary
+        // is not necessary
         graphView.gridLabelRenderer.setHumanRounding(false)
     }
 
@@ -413,19 +388,6 @@ class CoinMarketDetails : AppCompatActivity() {
         graphView.addSeries(series)
 
     }
-
-    private fun getCoinDetailsMap(coin: String): SortedMap<Long, Any?>? {
-        val _coin = coin.toUpperCase()
-        val coin_index = CoinMarketModel.mCurrentIndexToArraySymbolMap.get(_coin)
-
-        val array_element = CoinMarketModel.mCurrentCoinList!![coin_index!!]
-        val datamap = array_element[coinFrom] // array_element is a map, being accessed as an array
-        val coinToDataMap = datamap!!.get(coinTo) as MutableMap<Any?, Any?>
-
-        val details_coinToDataMap : SortedMap<Long, Any?>? = coinToDataMap.get("details") as  SortedMap<Long, Any?>?
-        return details_coinToDataMap
-    }
-
 
     private fun prepareX_Axis(coin: String){
         val details_coinToDataMap = this.getCoinDetailsMap(coin)

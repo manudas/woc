@@ -6,19 +6,21 @@ import java.util.*
 class Coin (name: String?) {
 
     companion object {
-        enum class price_period(val time_lapse_in_seconds: Int) {
+        public enum class price_period(val time_lapse_in_seconds: Int) {
             MINUTE(60 /* one minute in seconds */),
             DAILY(60 * 60 * 24 /* one day in seconds */),
             HOURLY(60 * 60 /* one hour in seconds */)
         }
 
         private val mCurrentIndexToArraySymbolMap: MutableMap<String, Int> = hashMapOf<String, Int>()
-        fun getCoinIndex(coin: String): Int?{
+        fun getCoinIndex(coin: String): Int? {
             return mCurrentIndexToArraySymbolMap.get(coin.toUpperCase())
         }
+
         fun setCoinIndex(coin: String, i: Int) {
             mCurrentIndexToArraySymbolMap.set(coin.toUpperCase(), i)
         }
+
         public val sortedCoinList: SparseArray<Coin> = SparseArray<Coin>()
             get() = field
 
@@ -28,9 +30,8 @@ class Coin (name: String?) {
             var result: Coin? = null
             if (coin_index != null) {
                 result = sortedCoinList.get(coin_index)
-            }
-            else {
-                result = Coin( _coin )
+            } else {
+                result = Coin(_coin)
 
             }
             return result!!
@@ -46,7 +47,7 @@ class Coin (name: String?) {
             return result
         }
 
-        public fun getAvailableSymbolList() : Array<String> {
+        public fun getAvailableSymbolList(): Array<String> {
             return mCurrentIndexToArraySymbolMap.keys.toTypedArray()
         }
 
@@ -59,8 +60,7 @@ class Coin (name: String?) {
             val symbol = CoinSymbolMap.get(coin_name.toLowerCase())
             if (symbol != null) {
                 return symbol
-            }
-            else {
+            } else {
                 return coin_name.toUpperCase()
             }
         }
@@ -162,7 +162,7 @@ class Coin (name: String?) {
     var name = name
         get() = this.name
         set(value: String?) {
-            if (this.name == null){
+            if (this.name == null) {
                 field = value
             }
         }
@@ -195,23 +195,22 @@ class Coin (name: String?) {
         }
 
     /* usd/eur -> time -> min/max in time period -> price */
-    private val historical: MutableMap<String, SortedMap<Long, MutableMap<String, Any?>>>
-            = mutableMapOf<String, SortedMap<Long, MutableMap<String, Any?>>>() // USD, EUR and so on
+    private val historical: MutableMap<String, SortedMap<Long, MutableMap<String, Any?>>> = mutableMapOf<String, SortedMap<Long, MutableMap<String, Any?>>>() // USD, EUR and so on
 
     /**
      * Add a new item to the price history of this coin
      * converte to the currency represented by toSym
      *
      */
-    public fun addHistorical(toSym: String, dataPriceMap: MutableMap<String, Any?>){
+    public fun addHistorical(toSym: String, dataPriceMap: MutableMap<String, Any?>) {
         var toSymbolMap = historical[toSym]
-        if (toSymbolMap == null){
+        if (toSymbolMap == null) {
             toSymbolMap = mutableMapOf<Long, MutableMap<String, Any?>>().toSortedMap()
             historical[toSym] = toSymbolMap
         }
         val time: Long = dataPriceMap.get("time").toString().toLong()
         var priceMap = toSymbolMap.get(time)
-        if (priceMap == null){
+        if (priceMap == null) {
 
             /* INFORMATION THAT IS SUPPOSED TO BE STORED IN dataPriceMap
              * (some could not come or come empty or null):
@@ -227,8 +226,7 @@ class Coin (name: String?) {
              */
 
             toSymbolMap[time] = dataPriceMap
-        }
-        else return
+        } else return
     }
 
     /**
@@ -241,18 +239,17 @@ class Coin (name: String?) {
      * more recent that has been stored
      *
      */
-    public fun getValueFromHistorical(toSym: String, time: Long?, value: String = "price", decimals: Int = 3) : Any? {
+    public fun getValueFromHistorical(toSym: String, time: Long?, value: String = "price", decimals: Int = 3): Any? {
         var toSymbolMap = historical[toSym]
         var price_or_historical_value: Any? = null
-        if (toSymbolMap != null){
-            var _time : Long? = null
+        if (toSymbolMap != null) {
+            var _time: Long? = null
             if (time == null) {
                 _time = toSymbolMap.lastKey() // more recent price_or_historical_value stored
-            }
-            else {
+            } else {
                 _time = time
             }
-            if (_time != null ){
+            if (_time != null) {
                 val min_resolution_in_milliseconds = 60 /* seconds */ * 1000 /* milliseconds each second */
                 val roundedTime = ((_time + min_resolution_in_milliseconds / 2) / 1000) * 1000
 
@@ -276,5 +273,24 @@ class Coin (name: String?) {
             }
         }
         return price_or_historical_value
+    }
+
+    /**
+     * Useful to find last recorded values of some
+     * entries such as Market Capitalization and
+     * volume
+     *
+     */
+    public fun getLastValueFromHistorical(toSym: String, value: String = "price", decimals: Int = 3): Any? {
+        var toSymbolMap = historical[toSym]
+        val keys = toSymbolMap!!.keys.toTypedArray().reversedArray() // reversed array to start for the last item
+        keys.forEach() {
+            // it es la key actual
+            val value = getValueFromHistorical(toSym, it, value, decimals)
+            if (value != null) {
+                return value
+            }
+        }
+        return null
     }
 }

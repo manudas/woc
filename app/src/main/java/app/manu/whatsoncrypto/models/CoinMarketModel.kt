@@ -291,6 +291,7 @@ class CoinMarketModel {
                 dataPriceMap["open"] = open
                 dataPriceMap["supply"] = supply
                 dataPriceMap["volume"] = volume
+                dataPriceMap["price_period"] = Coin.Companion.price_period.DAILY
 
                 coin.addHistorical(coin_name, dataPriceMap)
 
