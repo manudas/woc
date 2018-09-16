@@ -215,7 +215,6 @@ class CoinMarketDetails : AppCompatActivity() {
             percentage_details_textview.text = ""
         }
 
-
         val supply = coin.getLastValueFromHistorical( coinToSymbol, "supply" ) as Double
 
         val marketCapCoinTo = supply * price
@@ -230,21 +229,13 @@ class CoinMarketDetails : AppCompatActivity() {
         val marketCapCoinFrom_textview = _mRootView!!.findViewById(R.id.market_cap_details_coinfrom) as TextView
         marketCapCoinFrom_textview.text = marketCapCoinFrom_str
 
+        val volume24hTo = coin!!.getValueFromHistorical(coinToSymbol, null, "volume", 3, Coin.Companion.price_period.DAILY) as Double
 
-
-
-        como conseguir esa info ?mmmmmm as the volume I have depends on the period I cant look for the last one
-        becase that would give an erroneus result. So or I aggregate 24 hours or I make some sort of search
-        for a time stamp which is marked as period.DAYLY
-
-
-
-        var volume24hTo = coin_to_conversion_map["VOLUME24HTO"].toString().toDouble() // map accessed as array
         val volume24hTo_str = String.format(coinToSymbol+" %,.2f", volume24hTo) // format the number separating by thousand and with two decimals
         val volume24hTo_textview = _mRootView!!.findViewById(R.id.volume_24h_details_to) as TextView
         volume24hTo_textview.text = volume24hTo_str
 
-        var volume24hFrom = coin_to_conversion_map["VOLUME24H"].toString().toDouble() // map accessed as array
+        val volume24hFrom = volume24hTo * price;
         val volume24hFrom_str = String.format(coinFromSymbol+" %,.2f", volume24hFrom) // format the number separating by thousand and with two decimals
         val volume24hFrom_textview = _mRootView!!.findViewById(R.id.volume_24h_details_from) as TextView
         volume24hFrom_textview.text = volume24hFrom_str
@@ -282,19 +273,28 @@ class CoinMarketDetails : AppCompatActivity() {
         val now = System.currentTimeMillis()
 
         this.topBound = now
+
+
+
+
+        make a supergraph with time_period.Minute, Hourly and Daily
+
+        tal vez usando un sparearray
+
+
         val coin = getCoinDetailsMap(this.coinFrom!!)
         val coin_times = coin!!.keys
         val lowest_time = coin_times.first() // is a sorted map, so the first is the highest
         // this.bottomBound = lowest_time*1000
 
-        this.bottomBound = if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.MINUTE) {
-            now - (3600*1000) // 1H
+        this.bottomBound = if (this.mGranurality == Coin.Companion.price_period.MINUTE) {
+            now - (Coin.Companion.price_period.MINUTE.time_lapse_in_seconds * 60 * 1000) // 1H
         }
         else if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.HOURLY) {
-            now - (3600*3*1000) // 3H
+            now - (Coin.Companion.price_period.MINUTE.time_lapse_in_seconds * 1000 * 3) // 3H
         }
         else {
-            now - (3600*24*3*1000) // 3D for now
+            now - (Coin.Companion.price_period.DAILY.time_lapse_in_seconds * 3 * 1000) // 3D for now
         }
 
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
@@ -370,6 +370,12 @@ class CoinMarketDetails : AppCompatActivity() {
         val series = LineGraphSeries<DataPoint>()
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
 //        graphView.onDataChanged(false, false)
+
+
+        make a supergraph with time_period.Minute, Hourly and Daily
+        tal vez usando un sparearray
+
+
         val coin_price_details = this.getCoinDetailsMap(coin) as Map<Long, Map<String, Any?>>// is a map
         for(index in this.mCurrentX_axis.keys) {
             val element = coin_price_details!![index] as Map<String, Any?>// is a map
@@ -390,6 +396,12 @@ class CoinMarketDetails : AppCompatActivity() {
     }
 
     private fun prepareX_Axis(coin: String){
+
+        make a supergraph with time_period.Minute, Hourly and Daily
+
+
+        tal vez usando un sparearray
+
         val details_coinToDataMap = this.getCoinDetailsMap(coin)
         val keys = details_coinToDataMap!!.keys
         // val offset = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings // UTC to local time

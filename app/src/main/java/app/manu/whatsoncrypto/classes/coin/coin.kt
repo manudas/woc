@@ -195,18 +195,18 @@ class Coin (name: String?) {
         }
 
     /* usd/eur -> time -> min/max in time period -> price */
-    private val historical: MutableMap<String, SortedMap<Long, MutableMap<String, Any?>>> = mutableMapOf<String, SortedMap<Long, MutableMap<String, Any?>>>() // USD, EUR and so on
+    private val historical: MutableMap<String, MutableMap<price_period, SortedMap<Long, MutableMap<String, Any?>>>> = mutableMapOf ()
 
     /**
      * Add a new item to the price history of this coin
      * converte to the currency represented by toSym
      *
      */
-    public fun addHistorical(toSym: String, dataPriceMap: MutableMap<String, Any?>) {
-        var toSymbolMap = historical[toSym]
+    public fun addHistorical(toSym: String, dataPriceMap: MutableMap<String, Any?>, period: Companion.price_period = price_period.MINUTE) {
+        var toSymbolMap = historical[period]!![toSym]
         if (toSymbolMap == null) {
             toSymbolMap = mutableMapOf<Long, MutableMap<String, Any?>>().toSortedMap()
-            historical[toSym] = toSymbolMap
+            historical[period]!![toSym] = toSymbolMap
         }
         val time: Long = dataPriceMap.get("time").toString().toLong()
         var priceMap = toSymbolMap.get(time)
@@ -239,8 +239,8 @@ class Coin (name: String?) {
      * more recent that has been stored
      *
      */
-    public fun getValueFromHistorical(toSym: String, time: Long?, value: String = "price", decimals: Int = 3): Any? {
-        var toSymbolMap = historical[toSym]
+    public fun getValueFromHistorical(toSym: String, time: Long?, value: String = "price", decimals: Int = 3, period: price_period = price_period.MINUTE): Any? {
+        var toSymbolMap = historical[period]!![toSym]
         var price_or_historical_value: Any? = null
         if (toSymbolMap != null) {
             var _time: Long? = null
@@ -250,7 +250,17 @@ class Coin (name: String?) {
                 _time = time
             }
             if (_time != null) {
-                val min_resolution_in_milliseconds = 60 /* seconds */ * 1000 /* milliseconds each second */
+                var min_resolution_in_milliseconds =
+                        if (period == Coin.Companion.price_period.MINUTE) {
+                            60 /* seconds */ * 1000 /* milliseconds each second */
+                        }
+                        else if (period == Coin.Companion.price_period.HOURLY) {
+                            60 * 60 * 1000
+                        }
+                        else { // DAILY
+                            60 * 60 * 24 * 1000
+                        }
+
                 val roundedTime = ((_time + min_resolution_in_milliseconds / 2) / 1000) * 1000
 
                 val price_map = toSymbolMap[roundedTime]
@@ -281,16 +291,20 @@ class Coin (name: String?) {
      * volume
      *
      */
-    public fun getLastValueFromHistorical(toSym: String, value: String = "price", decimals: Int = 3): Any? {
-        var toSymbolMap = historical[toSym]
+    public fun getLastValueFromHistorical(toSym: String, value: String = "price", decimals: Int = 3, period : price_period = price_period.MINUTE): Any? {
+        var toSymbolMap = historical[period]!![toSym]
         val keys = toSymbolMap!!.keys.toTypedArray().reversedArray() // reversed array to start for the last item
         keys.forEach() {
             // it es la key actual
-            val value = getValueFromHistorical(toSym, it, value, decimals)
+            val value = getValueFromHistorical(toSym, it, value, decimals, period)
             if (value != null) {
                 return value
             }
         }
         return null
     }
+
+    /**
+     * Returns an ordered
+     */
 }
