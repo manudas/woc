@@ -195,7 +195,8 @@ class Coin (name: String?) {
         }
 
     /* usd/eur -> time -> min/max in time period -> price */
-    private val historical: MutableMap<String, MutableMap<price_period, SortedMap<Long, MutableMap<String, Any?>>>> = mutableMapOf ()
+    // private val historical: MutableMap<String, MutableMap<price_period, SortedMap<Long, MutableMap<String, Any?>>>> = mutableMapOf ()
+    private val historical = mutableMapOf<String, CoinHistorical>()
 
     /**
      * Add a new item to the price history of this coin
@@ -203,10 +204,16 @@ class Coin (name: String?) {
      *
      */
     public fun addHistorical(toSym: String, dataPriceMap: MutableMap<String, Any?>, period: Companion.price_period = price_period.MINUTE) {
-        var toSymbolMap = historical[period]!![toSym]
+
+
+        // historical[toSym]!![period]
+        var toSymbolMap = historical[toSym]!![period]
+
+
+
         if (toSymbolMap == null) {
             toSymbolMap = mutableMapOf<Long, MutableMap<String, Any?>>().toSortedMap()
-            historical[period]!![toSym] = toSymbolMap
+            historical[toSym]!![period] = toSymbolMap
         }
         val time: Long = dataPriceMap.get("time").toString().toLong()
         var priceMap = toSymbolMap.get(time)
@@ -240,7 +247,7 @@ class Coin (name: String?) {
      *
      */
     public fun getValueFromHistorical(toSym: String, time: Long?, value: String = "price", decimals: Int = 3, period: price_period = price_period.MINUTE): Any? {
-        var toSymbolMap = historical[period]!![toSym]
+        var toSymbolMap = historical[toSym]!![period]
         var price_or_historical_value: Any? = null
         if (toSymbolMap != null) {
             var _time: Long? = null
@@ -292,7 +299,7 @@ class Coin (name: String?) {
      *
      */
     public fun getLastValueFromHistorical(toSym: String, value: String = "price", decimals: Int = 3, period : price_period = price_period.MINUTE): Any? {
-        var toSymbolMap = historical[period]!![toSym]
+        var toSymbolMap = historical[toSym]!![period]
         val keys = toSymbolMap!!.keys.toTypedArray().reversedArray() // reversed array to start for the last item
         keys.forEach() {
             // it es la key actual
@@ -303,8 +310,4 @@ class Coin (name: String?) {
         }
         return null
     }
-
-    /**
-     * Returns an ordered
-     */
 }
