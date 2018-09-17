@@ -13,15 +13,16 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 
-import com.suleiman.pagination.utils.PaginationScrollListener
+// import com.suleiman.pagination.utils.PaginationScrollListener
 
 class NewsActivity : AppCompatActivity() {
 
-    internal var adapter: PaginationAdapter
-    internal var linearLayoutManager: LinearLayoutManager
+    internal var adapter: PaginationAdapter? = null
+    internal var linearLayoutManager: LinearLayoutManager? = null
 
-    internal var rv: RecyclerView
-    internal var progressBar: ProgressBar
+    internal var rv: RecyclerView? = null
+    internal var progressBar: ProgressBar? = null
+
     private var isLoading = false
     private var isLastPage = false
     private val TOTAL_PAGES = 3
