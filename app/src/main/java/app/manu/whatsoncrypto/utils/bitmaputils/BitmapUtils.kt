@@ -1,6 +1,5 @@
 package app.manu.whatsoncrypto.utils.bitmaputils
 
-
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -11,13 +10,10 @@ import android.view.View
 
 import android.view.View.MeasureSpec
 import android.graphics.Bitmap
-import android.graphics.Shader.TileMode
-import android.graphics.BitmapShader
-
-
-
-
-
+import android.graphics.BitmapFactory
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 /**
@@ -111,20 +107,6 @@ object BitmapUtils {
             width = v.measuredWidth
         }
 
-
-
-
-
-/*
-
-        width = 6000
-        height = 400
-
-*/
-
-
-
-
         var returned_bitmap = bitmap
         if (returned_bitmap == null) {
             returned_bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -153,4 +135,21 @@ object BitmapUtils {
         v.draw(c)
         return returned_bitmap
     }
+
+
+    fun getBitmapFromURL(src: String): Bitmap? {
+        try {
+            val url = URL(src)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.setDoInput(true)
+            connection.connect()
+            val input = connection.getInputStream()
+            return BitmapFactory.decodeStream(input)
+        } catch (e: IOException) {
+            // Log exception
+            return null
+        }
+
+    }
+
 }

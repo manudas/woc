@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@+id/include">
 
         <TextView
-            android:id="@+id/coinMarketCapTitle"
+            android:id="@+id/newsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
@@ -37,7 +37,7 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/coinMarketCapLine"
             android:layout_width="wrap_content"
             android:layout_height="2dp"
@@ -48,7 +48,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/newsDataContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -62,6 +62,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newsTitleLinearLayout">
-    </LinearLayout>
+    </android.support.v7.widget.RecyclerView>
+
+    <ProgressBar
+        android:id="@+id/newsProgressBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="200dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

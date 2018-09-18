@@ -17,11 +17,11 @@ import android.widget.ProgressBar
 
 class NewsActivity : AppCompatActivity() {
 
-    internal var adapter: PaginationAdapter? = null
-    internal var linearLayoutManager: LinearLayoutManager? = null
+    internal lateinit var adapter: PaginationAdapter
+    internal lateinit var linearLayoutManager: LinearLayoutManager
 
-    internal var rv: RecyclerView? = null
-    internal var progressBar: ProgressBar? = null
+    internal lateinit var rv: RecyclerView
+    internal lateinit var progressBar: ProgressBar
 
     private var isLoading = false
     private var isLastPage = false
@@ -30,10 +30,10 @@ class NewsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_news_layout)
 
-        rv = findViewById<View>(R.id.main_recycler) as RecyclerView
-        progressBar = findViewById<View>(R.id.main_progress) as ProgressBar
+        rv = findViewById<View>(R.id.newsDataContainer) as RecyclerView
+        progressBar = findViewById<View>(R.id.newsProgressBar) as ProgressBar
 
         adapter = PaginationAdapter(this)
 

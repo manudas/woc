@@ -4,12 +4,20 @@ import android.graphics.Bitmap
 
 class News {
 
-    constructor(headline: String, body: String, lead: String? = null, image: Bitmap? = null, url: String? = null) {
+    constructor(
+            headline: String,
+            body: String,
+            lead: String? = null,
+            image: Bitmap? = null,
+            url: String? = null,
+            timestamp: Long? = null) {
+
         this.headline = headline
         this.lead = lead
         this.picture = image
         this.body = body
         this.url = url
+        this.timestamp = timestamp
     }
 
     private var headline: String
@@ -36,5 +44,10 @@ class News {
         get() = this.url
         set(value: String?) {
             url = value
+        }
+    private var timestamp: Long?
+        get() = this.timestamp
+        set(value: Long?) {
+            timestamp = value
         }
 }
