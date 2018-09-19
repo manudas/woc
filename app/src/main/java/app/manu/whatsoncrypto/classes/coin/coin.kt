@@ -196,7 +196,7 @@ class Coin (name: String?) {
 
     /* usd/eur -> time -> min/max in time period -> price */
     // private val historical: MutableMap<String, MutableMap<price_period, SortedMap<Long, MutableMap<String, Any?>>>> = mutableMapOf ()
-    private val historical = mutableMapOf<String, CoinHistorical>()
+    public val historical = mutableMapOf<String, CoinHistorical>()
 
     /**
      * Add a new item to the price history of this coin

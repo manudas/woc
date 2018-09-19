@@ -274,18 +274,17 @@ class CoinMarketDetails : AppCompatActivity() {
 
         this.topBound = now
 
+        val coin = Coin.getCoinData(this.coinFrom!!)
 
+        val coinPriceHistoryIterator = coin!!.historical[this.coinTo!!]!!.iterator()
+        val hasValues = coinPriceHistoryIterator.hasNext()
 
+        var lowest_time: Long
+        if (hasValues) {
+            val historical_map_value = coinPriceHistoryIterator.next()
+            lowest_time = historical_map_value.get("time").toString().toLong()
 
-        make a supergraph with time_period.Minute, Hourly and Daily
-
-        tal vez usando un sparearray
-
-
-        val coin = getCoinDetailsMap(this.coinFrom!!)
-        val coin_times = coin!!.keys
-        val lowest_time = coin_times.first() // is a sorted map, so the first is the highest
-        // this.bottomBound = lowest_time*1000
+        }
 
         this.bottomBound = if (this.mGranurality == Coin.Companion.price_period.MINUTE) {
             now - (Coin.Companion.price_period.MINUTE.time_lapse_in_seconds * 60 * 1000) // 1H
@@ -369,24 +368,17 @@ class CoinMarketDetails : AppCompatActivity() {
         // this will convert the Date to double via Date#getTime()
         val series = LineGraphSeries<DataPoint>()
         val graphView = this._mRootView!!.findViewById(R.id.graph_view) as GraphView
-//        graphView.onDataChanged(false, false)
 
+        val coin = Coin.getCoinData(this.coinFrom!!)
 
-        make a supergraph with time_period.Minute, Hourly and Daily
-        tal vez usando un sparearray
+        val coinPriceHistoryIterator = coin!!.historical[this.coinTo!!]!!.iterator()
+        while(coinPriceHistoryIterator.hasNext()) {
+            val next_history_element = coinPriceHistoryIterator.next()
 
-
-        val coin_price_details = this.getCoinDetailsMap(coin) as Map<Long, Map<String, Any?>>// is a map
-        for(index in this.mCurrentX_axis.keys) {
-            val element = coin_price_details!![index] as Map<String, Any?>// is a map
-            val current_date = this.mCurrentX_axis[index]
-
-
-            val higher_price_in_period = element.get("high").toString().toDouble()
-            val lower_price_in_period = element.get("low").toString().toDouble()
-            val average_price_in_period = average(higher_price_in_period , lower_price_in_period)
-
-            val point: DataPoint = DataPoint(current_date, average_price_in_period)
+            val price = next_history_element["price"].toString().toDouble()
+            val time = next_history_element["time"].toString().toLong()
+            val current_date = this.mCurrentX_axis[time]
+            val point: DataPoint = DataPoint(current_date, price)
             series.appendData(point,true, mCurrentX_axis.size)
         }
 
@@ -397,21 +389,20 @@ class CoinMarketDetails : AppCompatActivity() {
 
     private fun prepareX_Axis(coin: String){
 
-        make a supergraph with time_period.Minute, Hourly and Daily
-
-
-        tal vez usando un sparearray
-
-        val details_coinToDataMap = this.getCoinDetailsMap(coin)
-        val keys = details_coinToDataMap!!.keys
-        // val offset = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings // UTC to local time
-
         mCurrentX_axis.clear()
 
-        for (key : Long in keys) {
-            val date = Date((key * 1000)) // from seconds to milliseconds
-            val indice = key
+        val coin = Coin.getCoinData(this.coinFrom!!)
+
+        val coinPriceHistoryIterator = coin!!.historical[this.coinTo!!]!!.iterator()
+        while(coinPriceHistoryIterator.hasNext()) {
+            val next_history_element = coinPriceHistoryIterator.next()
+            val time = next_history_element["time"].toString().toLong()
+
+
+            val date = Date((time * 1000)) // from seconds to milliseconds
+            val indice = time
             mCurrentX_axis.put(indice, date)
         }
+
     }
 }
