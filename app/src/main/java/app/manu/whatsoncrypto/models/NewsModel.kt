@@ -8,6 +8,7 @@ import org.json.JSONArray
 import app.manu.whatsoncrypto.utils.JSON.JSONParser
 import android.graphics.BitmapFactory
 import android.util.Log
+import app.manu.whatsoncrypto.utils.bitmaputils.BitmapUtils
 
 
 class NewsModel {
@@ -21,6 +22,8 @@ class NewsModel {
         enum class action (val path: String) {
             NEWS("v2/news/?")
         }
+
+        val _mNewsList: MutableList<News> = mutableListOf()
     }
 
 
@@ -74,6 +77,12 @@ class NewsModel {
         }
         _mAsyncCode.add( function_to_exec )
         _myAsyncMachine!!.execute()
+    }
+
+    public fun cacheNews(json_query_result: JSONObject) : List<News> {
+        val result = this.jsonNewsAsNewsArray(json_query_result)
+        NewsModel._mNewsList.addAll(result)
+        return NewsModel._mNewsList
     }
 
     private fun jsonNewsAsNewsArray(json_query_result: JSONObject?) : List<News> {
@@ -130,15 +139,10 @@ class NewsModel {
             val loop_limit = Math.min(url_arr.size, limit)
             val result: MutableMap<String?, Bitmap?> = mutableMapOf()
             for (i in 0 until loop_limit) {
+
                 val urldisplay = url_arr[i]
-                var mImage: Bitmap? = null
-                try {
-                    val `in` = java.net.URL(urldisplay).openStream()
-                    mImage = BitmapFactory.decodeStream(`in`)
-                } catch (e: Exception) {
-                    Log.e("Error", e.message)
-                    e.printStackTrace()
-                }
+                val mImage: Bitmap? = BitmapUtils.getBitmapFromURL(urldisplay)
+
                 result.put(urldisplay, mImage)
             }
             return result

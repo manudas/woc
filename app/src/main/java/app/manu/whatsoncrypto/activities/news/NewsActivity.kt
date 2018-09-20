@@ -12,6 +12,8 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import app.manu.whatsoncrypto.classes.news.News
+import app.manu.whatsoncrypto.models.NewsModel
 
 // import com.suleiman.pagination.utils.PaginationScrollListener
 
@@ -27,6 +29,8 @@ class NewsActivity : AppCompatActivity() {
     private var isLastPage = false
     private val TOTAL_PAGES = 3
     private var currentPage = PAGE_START
+
+    private val newsModel: NewsModel = NewsModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,33 +50,40 @@ class NewsActivity : AppCompatActivity() {
 
         rv.addOnScrollListener(object : PaginationScrollListener(linearLayoutManager) {
 
-            val totalPageCount: Int
+            override val totalPageCount: Int
                 get() = TOTAL_PAGES
 
-            val isLastPage: Boolean
+            override val isLastPage: Boolean
                 get() = isLastPage
 
-            var isLoading: Boolean
+            override var isLoading: Boolean = false
                 get() = isLoading
 
-            protected fun loadMoreItems() {
+            protected override fun loadMoreItems() {
                 isLoading = true
                 currentPage += 1
 
-                // mocking network delay for API call
-                Handler().postDelayed({ loadNextPage() }, 1000)
+                loadNextPage()
             }
         })
 
-
-        // mocking network delay for API call
-        Handler().postDelayed({ loadFirstPage() }, 1000)
-
+        loadFirstPage()
     }
 
 
     private fun loadFirstPage() {
         Log.d(TAG, "loadFirstPage: ")
+
+        val addAllNews: (List<News>) -> Unit = {news_list -> adapter.addAll(news_list)}
+
+        val func_list: (Any?) -> Any? = {
+            // it es el parametro, ya que no se especificó otro delante de una flecha ->
+            newsModel::cacheNews
+        }
+        newsModel.getNews()
+
+        this.newsModel.getNews(null)
+
         val movies = Movie.createMovies(adapter.getItemCount())
         progressBar.visibility = View.GONE
         adapter.addAll(movies)

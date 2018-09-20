@@ -3,12 +3,13 @@ package app.manu.whatsoncrypto.activities.news
 import app.manu.whatsoncrypto.R
 
 import android.content.Context
-import android.graphics.Movie
+
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import app.manu.whatsoncrypto.classes.news.News
 
 import java.util.ArrayList
 
@@ -18,7 +19,7 @@ import java.util.ArrayList
 
 class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var movies: MutableList<Movie>? = null
+    private var news: MutableList<News>? = null
 
     private var isLoadingAdded = false
 
@@ -26,15 +27,15 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
         get() = itemCount == 0
 
     init {
-        movies = ArrayList()
+        news = ArrayList()
     }
 
-    fun getMovies(): List<Movie>? {
-        return movies
+    fun getMovies(): List<News>? {
+        return news
     }
 
-    fun setMovies(movies: MutableList<Movie>) {
-        this.movies = movies
+    fun setMovies(news: MutableList<News>) {
+        this.news = news
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -75,11 +76,11 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
     }
 
     override fun getItemCount(): Int {
-        return if (movies == null) 0 else movies!!.size
+        return if (news == null) 0 else news!!.size
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == movies!!.size - 1 && isLoadingAdded) LOADING else ITEM
+        return if (position == news!!.size - 1 && isLoadingAdded) LOADING else ITEM
     }
 
     /*
@@ -87,21 +88,21 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
    _________________________________________________________________________________________________
     */
 
-    fun add(mc: Movie) {
-        movies!!.add(mc)
-        notifyItemInserted(movies!!.size - 1)
+    fun add(n: News) {
+        news!!.add(n)
+        notifyItemInserted(news!!.size - 1)
     }
 
-    fun addAll(mcList: List<Movie>) {
-        for (mc in mcList) {
-            add(mc)
+    fun addAll(newsList: List<News>) {
+        for (n in newsList) {
+            add(n)
         }
     }
 
-    fun remove(city: Movie?) {
-        val position = movies!!.indexOf(city)
+    fun remove(_news: News?) {
+        val position = news!!.indexOf(_news)
         if (position > -1) {
-            movies!!.removeAt(position)
+            news!!.removeAt(position)
             notifyItemRemoved(position)
         }
     }
@@ -116,23 +117,23 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
 
     fun addLoadingFooter() {
         isLoadingAdded = true
-        add(Movie())
+        // add(Movie())
     }
 
     fun removeLoadingFooter() {
         isLoadingAdded = false
 
-        val position = movies!!.size - 1
-        val item = getItem(position)
+        //val position = news!!.size - 1
+       // val item = getItem(position)
 
-        if (item != null) {
-            movies!!.removeAt(position)
-            notifyItemRemoved(position)
-        }
+        //if (item != null) {
+            //news!!.removeAt(position)
+           // notifyItemRemoved(position)
+        //}
     }
 
-    fun getItem(position: Int): Movie? {
-        return movies!![position]
+    fun getItem(position: Int): News? {
+        return news!![position]
     }
 
 
@@ -153,7 +154,7 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
         }
     }
 
-
+esto no se que significa
     protected inner class LoadingVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     companion object {

@@ -137,7 +137,7 @@ object BitmapUtils {
     }
 
 
-    fun getBitmapFromURL(src: String): Bitmap? {
+    fun getBitmapFromURL(src: String?): Bitmap? {
         try {
             val url = URL(src)
             val connection = url.openConnection() as HttpURLConnection
