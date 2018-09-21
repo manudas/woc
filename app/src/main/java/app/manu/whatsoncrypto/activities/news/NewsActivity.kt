@@ -31,8 +31,12 @@ class NewsActivity : AppCompatActivity() {
     private var currentPage = PAGE_START
 
     private val newsModel: NewsModel = NewsModel()
+    private var till_timestamp_news: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        till_timestamp_news = System.currentTimeMillis()/1000
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news_layout)
 
@@ -76,17 +80,13 @@ class NewsActivity : AppCompatActivity() {
 
         val addAllNews: (List<News>) -> Unit = {news_list -> adapter.addAll(news_list)}
 
-        val func_list: (Any?) -> Any? = {
+        val func_list: List<(Any?) -> Any?> = listOf(
             // it es el parametro, ya que no se especificó otro delante de una flecha ->
-            newsModel::cacheNews
-        }
-        newsModel.getNews()
+            newsModel::cacheNews as (Any?) -> Any?,
+            addAllNews as (Any?) -> Any?
+        )
 
-        this.newsModel.getNews(null)
-
-        val movies = Movie.createMovies(adapter.getItemCount())
-        progressBar.visibility = View.GONE
-        adapter.addAll(movies)
+        this.newsModel.getNews(this.till_timestamp_news, func_list)
 
         if (currentPage <= TOTAL_PAGES)
             adapter.addLoadingFooter()
@@ -96,18 +96,29 @@ class NewsActivity : AppCompatActivity() {
     }
 
     private fun loadNextPage() {
+
+        till_timestamp_news =- 60*60*24
+
         Log.d(TAG, "loadNextPage: $currentPage")
-        val movies = Movie.createMovies(adapter.getItemCount())
 
-        adapter.removeLoadingFooter()
-        isLoading = false
 
-        adapter.addAll(movies)
+        val addAllNews: (List<News>) -> Unit = {news_list -> adapter.addAll(news_list)}
 
-        if (currentPage != TOTAL_PAGES)
+        val func_list: List<(Any?) -> Any?> = listOf(
+                // it es el parametro, ya que no se especificó otro delante de una flecha ->
+                newsModel::cacheNews as (Any?) -> Any?,
+                addAllNews as (Any?) -> Any?
+        )
+
+        this.newsModel.getNews(this.till_timestamp_news, func_list)
+
+        if (currentPage <= TOTAL_PAGES)
             adapter.addLoadingFooter()
         else
             isLastPage = true
+
+        isLoading = false
+
     }
 
     companion object {

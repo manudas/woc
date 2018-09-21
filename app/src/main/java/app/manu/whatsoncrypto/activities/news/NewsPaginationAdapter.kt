@@ -30,11 +30,11 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
         news = ArrayList()
     }
 
-    fun getMovies(): List<News>? {
+    fun getNews(): List<News>? {
         return news
     }
 
-    fun setMovies(news: MutableList<News>) {
+    fun setNews(news: MutableList<News>) {
         this.news = news
     }
 
@@ -45,29 +45,29 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
         when (viewType) {
             ITEM -> viewHolder = getViewHolder(parent, inflater)
             LOADING -> {
-                val v2 = inflater.inflate(R.layout.item_progress, parent, false)
+                val v2 = inflater.inflate(R.layout.progress_circle, parent, false)
                 viewHolder = LoadingVH(v2)
             }
         }
-        return viewHolder
+        return viewHolder!!
     }
 
     private fun getViewHolder(parent: ViewGroup, inflater: LayoutInflater): RecyclerView.ViewHolder {
         val viewHolder: RecyclerView.ViewHolder
-        val v1 = inflater.inflate(R.layout.item_list, parent, false)
+        val v1 = inflater.inflate(R.layout.news_item_layout, parent, false)
         viewHolder = MovieVH(v1)
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        val movie = movies!![position]
+        val _news = news!![position]
 
         when (getItemViewType(position)) {
             ITEM -> {
                 val movieVH = holder as MovieVH
 
-                movieVH.textView.setText(movie.getTitle())
+                movieVH.textView.setText(_news.getTitle())
             }
             LOADING -> {
             }
@@ -154,7 +154,7 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
         }
     }
 
-esto no se que significa
+
     protected inner class LoadingVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     companion object {
