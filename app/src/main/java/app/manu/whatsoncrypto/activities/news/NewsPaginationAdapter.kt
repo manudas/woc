@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import app.manu.whatsoncrypto.classes.news.News
 
@@ -55,7 +56,7 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
     private fun getViewHolder(parent: ViewGroup, inflater: LayoutInflater): RecyclerView.ViewHolder {
         val viewHolder: RecyclerView.ViewHolder
         val v1 = inflater.inflate(R.layout.news_item_layout, parent, false)
-        viewHolder = MovieVH(v1)
+        viewHolder = NewsVH(v1)
         return viewHolder
     }
 
@@ -65,9 +66,15 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
 
         when (getItemViewType(position)) {
             ITEM -> {
-                val movieVH = holder as MovieVH
+                val NewsVH = holder as NewsVH
 
-                movieVH.textView.setText(_news.getTitle())
+                NewsVH.headlineNews.setText(_news.headline)
+                NewsVH.advanceNews.setText(_news.body)
+                NewsVH.urlNews.setText(_news.url)
+
+                // aqui debemos resolver una promesa:
+                // cuando esté listo el bitmap se asigna
+
             }
             LOADING -> {
             }
@@ -145,12 +152,18 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
     /**
      * Main list's content ViewHolder
      */
-    protected inner class MovieVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val textView: TextView
+    protected inner class NewsVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val headlineNews: TextView
+        val advanceNews: TextView
+        val urlNews: TextView
+        val imageNews: ImageView
 
         init {
 
-            textView = itemView.findViewById(R.id.item_text) as TextView
+            headlineNews = itemView.findViewById(R.id.headlineNews) as TextView
+            advanceNews = itemView.findViewById(R.id.advanceNews) as TextView
+            urlNews = itemView.findViewById(R.id.urlNews) as TextView
+            imageNews = itemView.findViewById(R.id.imageNews) as ImageView
         }
     }
 
