@@ -23,34 +23,15 @@ class News {
     }
 
     public var headline: String
-        get() = this.headline
-        set(value: String) {
-            headline = value
-        }
 
     public var body: String
-        get() = this.body
-        set(value: String) {
-            body = value
-        }
+
     public var picture: Bitmap?
-        get() = this.picture
-        set(value: Bitmap?) {
-            picture = value
-        }
+
     public var imageURL: String?
-        get() = this.imageURL
-        set(value: String?) {
-            imageURL = value
-        }
+
     public var url: String?
-        get() = this.url
-        set(value: String?) {
-            url = value
-        }
+
     public var timestamp: Long?
-        get() = this.timestamp
-        set(value: Long?) {
-            timestamp = value
-        }
+
 }

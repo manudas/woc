@@ -8,15 +8,13 @@ import org.json.JSONArray
 import app.manu.whatsoncrypto.utils.JSON.JSONParser
 import android.graphics.BitmapFactory
 import android.util.Log
+import app.manu.whatsoncrypto.classes.myCustomAsynTask
 import app.manu.whatsoncrypto.utils.bitmaputils.BitmapUtils
 
 
 class NewsModel {
     private lateinit var _coinAPI_BaseUrl: String
-    private lateinit var _myAsyncMachine: AsyncTask<String, Unit, Any?>
-    private val _mOnFinishAsyncMachineFunctions : MutableList<(Any?) -> Any?> = mutableListOf<(Any?) -> Any?>()
-    private val _mAsyncCode : MutableList<(Array<out String?>) -> Any?> = mutableListOf<(Array<out String?>) -> Any?>()
-    private val _mAsyncResult : MutableList<Any?> = mutableListOf<Any?>()
+    private var _myAsyncMachine: myCustomAsynTask = myCustomAsynTask()
 
     companion object {
         enum class action (val path: String) {
@@ -33,32 +31,15 @@ class NewsModel {
     }
 
     private fun resetAsynTask() {
-        this._myAsyncMachine = object: AsyncTask <String, Unit, Any?>() {
-            override fun doInBackground(vararg params: String?): Any? {
-                _mAsyncResult.clear()
-                for (function in _mAsyncCode) {
-                    _mAsyncResult.add(function(params))
-                }
-                return _mAsyncResult
-            }
-
-            override fun onPostExecute(result: Any?) {
-
-
-                for ((index, function) in _mOnFinishAsyncMachineFunctions.withIndex()) {
-                    val function_result = _mAsyncResult.getOrNull(index)
-                    function(function_result)
-                }
-            }
-        }
+        this._myAsyncMachine.resetAsynTask()
     }
 
 
     public fun getNews(beforeTimeStap: Long? = null, onFinish : List<(Any?) -> Any?>){
-        _mOnFinishAsyncMachineFunctions.clear()
-        _mOnFinishAsyncMachineFunctions.addAll( onFinish )
 
-        _mAsyncCode.clear()
+        this._myAsyncMachine.resetOnFinishFunctions( onFinish )
+
+        this._myAsyncMachine.resetCoreFunctions()
 
         val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
 
@@ -75,7 +56,8 @@ class NewsModel {
             val json: JSONObject? = jParser.getJSONFromUrl(url)
             return json
         }
-        _mAsyncCode.add( function_to_exec )
+        this._myAsyncMachine.addCoreFunctions (function_to_exec)
+
         _myAsyncMachine!!.execute()
     }
 
@@ -128,7 +110,15 @@ class NewsModel {
         return result_list
     }
 
-    private fun downloadImages(url_arr: Array<String?>, onFinish: List<(Any?) -> Any?>, limit: Int = 10) {
+    private fun downloadImages(url_arr: Array<String?>,
+                               onFinish: List<(Any?) -> Any?>,
+                               ofsset: Int = 0,
+                               limit: Int = 10) {
+
+
+        llevarse esta funcion a otro lado ?
+
+
         _mOnFinishAsyncMachineFunctions.clear()
 
         _mOnFinishAsyncMachineFunctions.addAll( onFinish )

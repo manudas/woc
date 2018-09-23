@@ -4,6 +4,7 @@ import android.os.AsyncTask
 import android.util.SparseArray
 import app.manu.whatsoncrypto.CoinMarket
 import app.manu.whatsoncrypto.classes.coin.Coin
+import app.manu.whatsoncrypto.classes.myCustomAsynTask
 import org.json.JSONObject
 import app.manu.whatsoncrypto.utils.JSON.JSONParser
 import org.json.JSONArray
@@ -13,10 +14,7 @@ import java.util.*
 class CoinMarketModel {
 
     private val _coinAPI_BaseUrl: String
-    private var _myAsyncMachine: AsyncTask<String, Unit, Any?>? = null
-    private val _mOnFinishAsyncMachineFunctions : MutableList<(Any?) -> Any?> = mutableListOf<(Any?) -> Any?>()
-    private val _mAsyncCode : MutableList<(Array<out String?>) -> Any?> = mutableListOf<(Array<out String?>) -> Any?>()
-    private val _mAsyncResult : MutableList<Any?> = mutableListOf<Any?>()
+    private var _myAsyncMachine: myCustomAsynTask = myCustomAsynTask()
 
     companion object {
 
@@ -62,25 +60,9 @@ class CoinMarketModel {
     }
 
     private fun resetAsynTask() {
-        this._myAsyncMachine = object: AsyncTask <String, Unit, Any?>() {
-            override fun doInBackground(vararg params: String?): Any? {
-                _mAsyncResult.clear()
-                for (function in _mAsyncCode) {
-                    _mAsyncResult.add(function(params))
-                }
-                return _mAsyncResult
-            }
-
-            override fun onPostExecute(result: Any?) {
-
-
-                for ((index, function) in _mOnFinishAsyncMachineFunctions.withIndex()) {
-                    val function_result = _mAsyncResult.getOrNull(index)
-                    function(function_result)
-                }
-            }
-        }
+        this._myAsyncMachine.resetAsynTask()
     }
+
 
     /**
      * Asks the api for the whole list of coins
@@ -91,10 +73,9 @@ class CoinMarketModel {
      *
      */
     public fun getCoinList(onFinish : List<(Any?) -> Any?>) {
-        _mOnFinishAsyncMachineFunctions.clear()
-        _mOnFinishAsyncMachineFunctions.addAll( onFinish )
+        this._myAsyncMachine.resetOnFinishFunctions( onFinish )
 
-        _mAsyncCode.clear()
+        this._myAsyncMachine.resetCoreFunctions()
 
         val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
             val jParser = JSONParser()
@@ -103,7 +84,8 @@ class CoinMarketModel {
             val json: JSONObject? = jParser.getJSONFromUrl(url)
             return json
         }
-        _mAsyncCode.add( function_to_exec )
+        this._myAsyncMachine.addCoreFunctions (function_to_exec)
+
         _myAsyncMachine!!.execute()
     }
 
@@ -115,10 +97,9 @@ class CoinMarketModel {
      *
      */
     public fun getCoinListByVolume(limit: Int?, page: Int?, to: String?, onFinish : List<(Any?) -> Any?>) {
-        _mOnFinishAsyncMachineFunctions.clear()
-        _mOnFinishAsyncMachineFunctions.addAll( onFinish )
+        this._myAsyncMachine.resetOnFinishFunctions( onFinish )
 
-        _mAsyncCode.clear()
+        this._myAsyncMachine.resetCoreFunctions()
 
         val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
             val jParser = JSONParser()
@@ -139,7 +120,7 @@ class CoinMarketModel {
             return json
         }
 
-        _mAsyncCode.add( function_to_exec )
+        this._myAsyncMachine.addCoreFunctions (function_to_exec)
         _myAsyncMachine!!.execute()
     }
 
@@ -155,10 +136,8 @@ class CoinMarketModel {
         /* Function to execute once we have the top list by volume */
         val onFirstFinish: (JSONObject?) -> Any? = fun(param: JSONObject?) : Any? {
 
-            _mOnFinishAsyncMachineFunctions.clear()
-            _mOnFinishAsyncMachineFunctions.addAll( onFinish )
-
-            _mAsyncCode.clear()
+            this._myAsyncMachine.resetOnFinishFunctions( onFinish )
+            this._myAsyncMachine.resetCoreFunctions()
 
             val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
                 val jParser = JSONParser()
@@ -183,11 +162,11 @@ class CoinMarketModel {
                 val json: JSONObject? = jParser.getJSONFromUrl(url)
                 return json
             }
-            cacheCoinList(_mAsyncResult.getOrNull(0) as JSONObject?)
+            cacheCoinList(this._myAsyncMachine.getResult().getOrNull(0) as JSONObject?)
 
             resetAsynTask()
 
-            _mAsyncCode.add( function_to_exec )
+            this._myAsyncMachine.addCoreFunctions (function_to_exec)
             _myAsyncMachine!!.execute()
             return null
         }
@@ -305,7 +284,6 @@ class CoinMarketModel {
     }
 
 
-
     /**
      * Asks the API for the PRICE details of the 
      * coin passed as a parameter
@@ -372,11 +350,11 @@ class CoinMarketModel {
             return json
         }
 
-        _mOnFinishAsyncMachineFunctions.clear()
-        _mOnFinishAsyncMachineFunctions.addAll( onFinish )
 
-        _mAsyncCode.clear()
-        _mAsyncCode.add( function_to_exec )
+        this._myAsyncMachine.resetOnFinishFunctions( onFinish )
+        this._myAsyncMachine.resetCoreFunctions()
+
+        this._myAsyncMachine.addCoreFunctions (function_to_exec)
         _myAsyncMachine!!.execute()
 
     }
