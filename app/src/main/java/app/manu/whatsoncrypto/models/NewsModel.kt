@@ -89,55 +89,48 @@ class NewsModel {
         val f: (Any?) -> Unit = {
             m ->
                 val mapa = m as Map<String?, Bitmap?>
-                for ((integer_key, url_key) in imageUrl.withIndex()) {
-                    val value = mapa.get(url_key)
-                    if (value != null) {
-                        for (news in result_list){
-                            if (news.imageURL == url_key) {
-                                news.picture = value
-                                break
-                            }
+                val keys = mapa.keys // it must have only one key
+                val url_key = keys.elementAt(0)
+                val value = mapa.get(url_key)
+                if (value != null) {
+                    for (news in result_list){
+                        if (news.imageURL == url_key) {
+                            news.picture = value
+                            break
                         }
                     }
                 }
         }
-
         val onFinish: List<(Any?) -> Any?> = listOf(
                 f
         )
-
         downloadImages(imageUrl, onFinish)
         return result_list
     }
 
     private fun downloadImages(url_arr: Array<String?>,
                                onFinish: List<(Any?) -> Any?>,
-                               ofsset: Int = 0,
+                               offset: Int = 0,
                                limit: Int = 10) {
 
 
-        llevarse esta funcion a otro lado ?
+        val index_from = offset*limit
+        val index_to = offset*limit + limit
+        val subArray = url_arr.sliceArray(IntRange(index_from, index_to).step(1).toList())
+        val needed_resources = Math.min(subArray.size, limit)
+        this._myAsyncMachine.initMultiple(needed_resources)
 
-
-        _mOnFinishAsyncMachineFunctions.clear()
-
-        _mOnFinishAsyncMachineFunctions.addAll( onFinish )
-
-        _mAsyncCode.clear()
-
-        val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
-            val loop_limit = Math.min(url_arr.size, limit)
-            val result: MutableMap<String?, Bitmap?> = mutableMapOf()
-            for (i in 0 until loop_limit) {
-
+        for (i in 0 until needed_resources) {
+            this._myAsyncMachine.resetOnFinishFunctions(onFinish, i = i)
+            val function_to_exec: (Array<out String?>) -> Any? = fun(param: Array<out String?>) : Any? {
+                val result: MutableMap<String?, Bitmap?> = mutableMapOf()
                 val urldisplay = url_arr[i]
                 val mImage: Bitmap? = BitmapUtils.getBitmapFromURL(urldisplay)
-
                 result.put(urldisplay, mImage)
+                return result
             }
-            return result
+            this._myAsyncMachine.resetCoreFunctions(listOf(function_to_exec), i)
+            this._myAsyncMachine.execute(i)
         }
-        _mAsyncCode.add( function_to_exec )
-        _myAsyncMachine!!.execute()
     }
 }
