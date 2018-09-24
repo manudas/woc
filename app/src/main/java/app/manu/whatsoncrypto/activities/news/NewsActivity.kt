@@ -78,7 +78,7 @@ class NewsActivity : AppCompatActivity() {
     private fun loadFirstPage() {
         Log.d(TAG, "loadFirstPage: ")
 
-        val addAllNews: (List<News>) -> Unit = {news_list -> adapter.addAll(news_list)}
+        val addAllNews: (Any?) -> Any? = {adapter.addAll(newsModel.getList())}
 
         val func_list: List<(Any?) -> Any?> = listOf(
             // it es el parametro, ya que no se especificó otro delante de una flecha ->

@@ -12,7 +12,7 @@ class myCustomAsynTask {
     private lateinit var  _mAsyncCode_arr : Array<MutableList<(Array<out String?>) -> Any?>>
     private lateinit var _mAsyncResult_arr : Array<MutableList<Any?>>
 
-    public fun resetAsynTask(i: Int? = null) : AsyncTask<String, Unit, Any?> {
+    public fun resetAsynTask(i: Int? = null, save: Boolean = true) : AsyncTask<String, Unit, Any?> {
         val machine_obj = object: AsyncTask<String, Unit, Any?>() {
             override fun doInBackground(vararg params: String?): Any? {
                 if (i == null) {
@@ -48,11 +48,12 @@ class myCustomAsynTask {
             }
         }
 
-        if (i == null) {
-            this._myAsyncMachine = machine_obj
-        }
-        else {
-            _myAsyncMachine_arr[i] = machine_obj
+        if (save == true) {
+            if (i == null) {
+                this._myAsyncMachine = machine_obj
+            } else {
+                this._myAsyncMachine_arr[i] = machine_obj
+            }
         }
         return machine_obj
     }
@@ -146,7 +147,7 @@ class myCustomAsynTask {
     public fun initMultiple(number: Int) {
 
         this._myAsyncMachine_arr = Array(number) { index->
-            resetAsynTask(index)
+            resetAsynTask(index, save = false)
         }
         this._mOnFinishAsyncMachineFunctions_arr = Array(number) { index ->
             mutableListOf<(Any?) -> Any?>()

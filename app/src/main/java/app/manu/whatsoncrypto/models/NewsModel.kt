@@ -35,6 +35,10 @@ class NewsModel {
     }
 
 
+    public fun getList(from: Int = 0, to: Int = _mNewsList.size): List<News> {
+        return _mNewsList.subList(from, to)
+    }
+
     public fun getNews(beforeTimeStap: Long? = null, onFinish : List<(Any?) -> Any?>){
 
         this._myAsyncMachine.resetOnFinishFunctions( onFinish )
