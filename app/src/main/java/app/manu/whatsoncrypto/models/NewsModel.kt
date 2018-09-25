@@ -85,6 +85,7 @@ class NewsModel {
             val body = newsJSON_obj.get("body") as String
 
             val news = News(headline,body,null, imageurl, url, published_timestamp)
+            result_list.add(news)
 
             imageUrl.set(i, imageurl)
 

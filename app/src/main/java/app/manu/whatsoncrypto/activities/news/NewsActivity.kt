@@ -57,11 +57,10 @@ class NewsActivity : AppCompatActivity() {
             override val totalPageCount: Int
                 get() = TOTAL_PAGES
 
-            override val isLastPage: Boolean
-                get() = isLastPage
+            override var isLastPage: Boolean = false
 
             override var isLoading: Boolean = false
-                get() = isLoading
+
 
             protected override fun loadMoreItems() {
                 isLoading = true
@@ -83,7 +82,8 @@ class NewsActivity : AppCompatActivity() {
         val func_list: List<(Any?) -> Any?> = listOf(
             // it es el parametro, ya que no se especificó otro delante de una flecha ->
             newsModel::cacheNews as (Any?) -> Any?,
-            addAllNews as (Any?) -> Any?
+            addAllNews as (Any?) -> Any?,
+            {unused  -> rv.removeView(this.progressBar)}
         )
 
         this.newsModel.getNews(this.till_timestamp_news, func_list)

@@ -131,6 +131,9 @@ class myCustomAsynTask {
     }
 
     public fun execute(i: Int? = null) {
+        if(this._myAsyncMachine.status == AsyncTask.Status.FINISHED) {
+            resetAsynTask(i)
+        }
         if (i == null) this._myAsyncMachine.execute()
         else this._myAsyncMachine_arr[i].execute()
     }

@@ -142,6 +142,7 @@
                 <ImageView
                     android:id="@+id/read_icon"
                     android:layout_height="match_parent"
+                    android:layout_width="0dp"
                     android:layout_weight="0.8"
                     app:srcCompat="@drawable/read_icon" />
 
