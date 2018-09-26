@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.ProgressBar
 import app.manu.whatsoncrypto.classes.news.News
 import app.manu.whatsoncrypto.models.NewsModel
+import kotlinx.android.synthetic.main.news_item_layout.view.*
 
 // import com.suleiman.pagination.utils.PaginationScrollListener
 
@@ -23,7 +24,7 @@ class NewsActivity : AppCompatActivity() {
     internal lateinit var linearLayoutManager: LinearLayoutManager
 
     internal lateinit var rv: RecyclerView
-    internal lateinit var progressBar: ProgressBar
+    // internal lateinit var progressBar: ProgressBar
 
     private var isLoading = false
     private var isLastPage = false
@@ -41,7 +42,7 @@ class NewsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_news_layout)
 
         rv = findViewById<View>(R.id.newsDataContainer) as RecyclerView
-        progressBar = findViewById<View>(R.id.newsProgressBar) as ProgressBar
+        // progressBar = findViewById<View>(R.id.newsProgressBar) as ProgressBar
 
         adapter = PaginationAdapter(this)
 
@@ -77,13 +78,19 @@ class NewsActivity : AppCompatActivity() {
     private fun loadFirstPage() {
         Log.d(TAG, "loadFirstPage: ")
 
-        val addAllNews: (Any?) -> Any? = {adapter.addAll(newsModel.getList())}
+        val addNews: (Any?) -> Any? = {
+            adapter.addAll(newsModel.getList().subList(0, ELEMENTS_BY_PAGE))
+            adapter.removeLoadingFooter()
+        }
 
         val func_list: List<(Any?) -> Any?> = listOf(
             // it es el parametro, ya que no se especificó otro delante de una flecha ->
             newsModel::cacheNews as (Any?) -> Any?,
-            addAllNews as (Any?) -> Any?,
+            addNews as (Any?) -> Any?
+                /*
+                ,
             {unused  -> rv.removeView(this.progressBar)}
+            */
         )
 
         this.newsModel.getNews(this.till_timestamp_news, func_list)
@@ -101,14 +108,43 @@ class NewsActivity : AppCompatActivity() {
 
         Log.d(TAG, "loadNextPage: $currentPage")
 
+        val sublist = newsModel.getList().subList(
+                currentPage*ELEMENTS_BY_PAGE,
+                currentPage*ELEMENTS_BY_PAGE + ELEMENTS_BY_PAGE)
 
-        val addAllNews: (List<News>) -> Unit = {news_list -> adapter.addAll(news_list)}
 
-        val func_list: List<(Any?) -> Any?> = listOf(
+        val addNews: (Any?) -> Any? = {
+            /* I have to keep the sublist definition instead of using
+             * sublist val here because in the moment I need to use
+             * this var, it could be empty (search for more news)
+             * and being and old reference, It won't be updated
+             */
+            adapter.addAll(newsModel.getList().subList(
+                    currentPage*ELEMENTS_BY_PAGE,
+                    currentPage*ELEMENTS_BY_PAGE + ELEMENTS_BY_PAGE))
+            adapter.removeLoadingFooter()
+        }
+
+        lateinit var func_list: List<(Any?) -> Any?>
+
+        // do we have elements in the sublist ?
+        cuidado, es aqui donde dependiendo de si tenemos elementos que mostrar, buscamos msá o
+        mostramos los que tenemos. func_list en concreto es onFinish function list.
+                Luego tenemos el getNews que habrá que evitar usar si tenemos noticias en la lista
+        if (sublist.size > 0) {
+            func_list = listOf(
+                    // it es el parametro, ya que no se especificó otro delante de una flecha ->
+                    newsModel::cacheNews as (Any?) -> Any?,
+                    addNews as (Any?) -> Any?
+            )
+        }
+        else {
+            func_list = listOf(
                 // it es el parametro, ya que no se especificó otro delante de una flecha ->
                 newsModel::cacheNews as (Any?) -> Any?,
-                addAllNews as (Any?) -> Any?
-        )
+                addNews as (Any?) -> Any?
+            )
+        }
 
         this.newsModel.getNews(this.till_timestamp_news, func_list)
 
@@ -126,6 +162,8 @@ class NewsActivity : AppCompatActivity() {
         private val TAG = "NewsActivity"
 
         private val PAGE_START = 0
+
+        private val ELEMENTS_BY_PAGE = 10
     }
 
 

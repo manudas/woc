@@ -130,13 +130,13 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
     fun removeLoadingFooter() {
         isLoadingAdded = false
 
-        //val position = news!!.size - 1
-       // val item = getItem(position)
+        val position = news!!.size - 1
+        val item = getItem(position)
 
-        //if (item != null) {
-            //news!!.removeAt(position)
-           // notifyItemRemoved(position)
-        //}
+        if (item != null) {
+            news!!.removeAt(position)
+            notifyItemRemoved(position)
+        }
     }
 
     fun getItem(position: Int): News? {

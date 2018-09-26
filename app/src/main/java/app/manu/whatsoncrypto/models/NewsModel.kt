@@ -1,13 +1,10 @@
 package app.manu.whatsoncrypto.models
 
 import android.graphics.Bitmap
-import android.os.AsyncTask
 import app.manu.whatsoncrypto.classes.news.News
 import org.json.JSONObject
 import org.json.JSONArray
 import app.manu.whatsoncrypto.utils.JSON.JSONParser
-import android.graphics.BitmapFactory
-import android.util.Log
 import app.manu.whatsoncrypto.classes.myCustomAsynTask
 import app.manu.whatsoncrypto.utils.bitmaputils.BitmapUtils
 
@@ -91,26 +88,32 @@ class NewsModel {
 
         }
 
-        val f: (Any?) -> Unit = {
-            m ->
-                val mapa = m as Map<String?, Bitmap?>
-                val keys = mapa.keys // it must have only one key
-                val url_key = keys.elementAt(0)
-                val value = mapa.get(url_key)
-                if (value != null) {
-                    for (news in result_list){
-                        if (news.imageURL == url_key) {
-                            news.picture = value
-                            break
-                        }
-                    }
-                }
+        fun f(result_l: MutableList<News>) : (Any?) -> Any? {
+            return {m : Any? -> downloadFiles_aux_saveBitmap(result_l, m)}
         }
+
         val onFinish: List<(Any?) -> Any?> = listOf(
-                f
+                f(result_list)
         )
         downloadImages(imageUrl, onFinish)
         return result_list
+    }
+
+
+    private fun downloadFiles_aux_saveBitmap (result_list: MutableList<News>, m: Any?) : Any?  {
+        val mapa = m as Map<String?, Bitmap?>
+        val keys = mapa.keys // it must have only one key
+        val url_key = keys.elementAt(0)
+        val value = mapa.get(url_key)
+        if (value != null) {
+            for (news in result_list){
+                if (news.imageURL == url_key) {
+                    news.picture = value
+                    break
+                }
+            }
+        }
+        return null
     }
 
     private fun downloadImages(url_arr: Array<String?>,
