@@ -40,6 +40,7 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+
         var viewHolder: RecyclerView.ViewHolder? = null
         val inflater = LayoutInflater.from(parent.context)
 
@@ -47,6 +48,11 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
             ITEM -> viewHolder = getViewHolder(parent, inflater)
             LOADING -> {
                 val v2 = inflater.inflate(R.layout.progress_circle, parent, false)
+
+                val layoutParams : ViewGroup.LayoutParams = v2.layoutParams
+                layoutParams.height = (parent.height * 0.1).toInt()
+                v2.layoutParams = layoutParams
+
                 viewHolder = LoadingVH(v2)
             }
         }
@@ -54,8 +60,23 @@ class PaginationAdapter(private val context: Context) : RecyclerView.Adapter<Rec
     }
 
     private fun getViewHolder(parent: ViewGroup, inflater: LayoutInflater): RecyclerView.ViewHolder {
+        /*
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View itemView = inflater.inflate(R.layout.itemview, parent, false);
+
+            ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
+            layoutParams.height = (int) (parent.getHeight() * 0.1);
+            itemView.setLayoutParams(layoutParams);
+
+            return new MyViewHolder(itemView)
+         */
         val viewHolder: RecyclerView.ViewHolder
         val v1 = inflater.inflate(R.layout.news_item_layout, parent, false)
+
+        val layoutParams : ViewGroup.LayoutParams = v1.layoutParams
+        layoutParams.height = (parent.height * 0.1).toInt()
+        v1.layoutParams = layoutParams
+
         viewHolder = NewsVH(v1)
         return viewHolder
     }

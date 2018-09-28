@@ -100,7 +100,26 @@ class NewsModel {
     }
 
 
-    private fun downloadFiles_aux_saveBitmap (result_list: MutableList<News>, m: Any?) : Any?  {
+    public fun downloadImagesFromNewsList(offset: Int, limit: Int){
+        val list = getList(offset, offset + limit)
+        if (list.size > 0) {
+            val url_arr : MutableList<String?> = mutableListOf()
+            for ((index, news) in list.withIndex()) {
+                if (news.picture == null)
+                url_arr.add(news.imageURL)
+            }
+            if (url_arr.size > 0) {
+                fun f(result_l: List<News>): (Any?) -> Any? {
+                    return { m: Any? -> downloadFiles_aux_saveBitmap(result_l, m) }
+                }
+
+                val onFinishF = listOf(f(list))
+                downloadImages(url_arr.toTypedArray(), onFinishF, 0, limit)
+            }
+        }
+    }
+
+    private fun downloadFiles_aux_saveBitmap (result_list: List<News>, m: Any?) : Any?  {
         val mapa = m as Map<String?, Bitmap?>
         val keys = mapa.keys // it must have only one key
         val url_key = keys.elementAt(0)
@@ -123,7 +142,8 @@ class NewsModel {
 
 
         val index_from = offset*limit
-        val index_to = offset*limit + limit
+        var index_to = offset*limit + limit - 1
+        index_to = if ((url_arr.size -1)  < index_to) url_arr.size -1 else index_to
         val subArray = url_arr.sliceArray(IntRange(index_from, index_to).step(1).toList())
         val needed_resources = Math.min(subArray.size, limit)
         this._myAsyncMachine.initMultiple(needed_resources)

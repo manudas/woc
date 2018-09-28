@@ -53,14 +53,23 @@ class NewsActivity : AppCompatActivity() {
 
         rv.setAdapter(adapter)
 
+        val activity = this
+
         rv.addOnScrollListener(object : PaginationScrollListener(linearLayoutManager) {
 
             override val totalPageCount: Int
                 get() = TOTAL_PAGES
 
-            override var isLastPage: Boolean = false
-
-            override var isLoading: Boolean = false
+            override var isLastPage: Boolean
+                get() = activity.isLastPage
+                set(value) {
+                    activity.isLastPage = value
+                }
+            override var isLoading: Boolean
+                get() = activity.isLoading
+                set(value) {
+                    activity.isLoading = value
+                }
 
 
             protected override fun loadMoreItems() {
@@ -87,10 +96,6 @@ class NewsActivity : AppCompatActivity() {
             // it es el parametro, ya que no se especificó otro delante de una flecha ->
             newsModel::cacheNews as (Any?) -> Any?,
             addNews as (Any?) -> Any?
-                /*
-                ,
-            {unused  -> rv.removeView(this.progressBar)}
-            */
         )
 
         this.newsModel.getNews(this.till_timestamp_news, func_list)
@@ -103,8 +108,6 @@ class NewsActivity : AppCompatActivity() {
     }
 
     private fun loadNextPage() {
-
-        till_timestamp_news =- 60*60*24
 
         Log.d(TAG, "loadNextPage: $currentPage")
 
@@ -127,26 +130,17 @@ class NewsActivity : AppCompatActivity() {
 
         lateinit var func_list: List<(Any?) -> Any?>
 
-        // do we have elements in the sublist ?
-        cuidado, es aqui donde dependiendo de si tenemos elementos que mostrar, buscamos msá o
-        mostramos los que tenemos. func_list en concreto es onFinish function list.
-                Luego tenemos el getNews que habrá que evitar usar si tenemos noticias en la lista
-        if (sublist.size > 0) {
-            func_list = listOf(
-                    // it es el parametro, ya que no se especificó otro delante de una flecha ->
-                    newsModel::cacheNews as (Any?) -> Any?,
-                    addNews as (Any?) -> Any?
-            )
-        }
-        else {
+        if (sublist.size <= 0) {
+
+            till_timestamp_news =- 60*60*24
+
             func_list = listOf(
                 // it es el parametro, ya que no se especificó otro delante de una flecha ->
                 newsModel::cacheNews as (Any?) -> Any?,
                 addNews as (Any?) -> Any?
             )
+            this.newsModel.getNews(this.till_timestamp_news, func_list)
         }
-
-        this.newsModel.getNews(this.till_timestamp_news, func_list)
 
         if (currentPage <= TOTAL_PAGES)
             adapter.addLoadingFooter()
@@ -154,6 +148,15 @@ class NewsActivity : AppCompatActivity() {
             isLastPage = true
 
         isLoading = false
+
+        // do we have elements in the sublist ?
+        if (sublist.size > 0) {
+            func_list = listOf(
+                    // @TODO: to delete: No need to invoke asnynmachine to download news, so no need to add onFinish functions
+            )
+            this.newsModel.downloadImagesFromNewsList(currentPage*ELEMENTS_BY_PAGE, ELEMENTS_BY_PAGE)
+            addNews(null)
+        }
 
     }
 

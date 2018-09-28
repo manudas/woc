@@ -35,6 +35,9 @@ abstract class PaginationScrollListener
                 loadMoreItems()
             }
         }
+        else {
+            val breakpoint="";
+        }
 
     }
 
