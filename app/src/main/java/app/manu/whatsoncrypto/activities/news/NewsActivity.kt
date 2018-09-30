@@ -49,7 +49,7 @@ class NewsActivity : AppCompatActivity() {
         rv = findViewById<View>(R.id.newsDataContainer) as RecyclerView
         // progressBar = findViewById<View>(R.id.newsProgressBar) as ProgressBar
 
-        adapter = PaginationAdapter(this)
+        adapter = PaginationAdapter(this, ELEMENTS_BY_PAGE)
 
         linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rv.setLayoutManager(linearLayoutManager)
@@ -80,12 +80,14 @@ class NewsActivity : AppCompatActivity() {
             protected override fun loadMoreItems() {
                 isLoading = true
                 currentPage += 1
-
-                loadNextPage()
+                adapter.addLoadingFooter()
+                // mocking network delay for API call
+                Handler().postDelayed({ loadNextPage() }, 1000)
             }
         })
 
-        loadFirstPage()
+        // mocking network delay for API call
+        Handler().postDelayed({ loadFirstPage() }, 1000)
     }
 
 
@@ -93,8 +95,9 @@ class NewsActivity : AppCompatActivity() {
         Log.d(TAG, "loadFirstPage: ")
 
         val addNews: (Any?) -> Any? = {
-            adapter.addAll(newsModel.getList().subList(0, ELEMENTS_BY_PAGE))
-            adapter.removeLoadingFooter()
+            val till = ELEMENTS_BY_PAGE
+            adapter.addAll(newsModel.getList().subList(0, till))
+            // adapter.removeLoadingFooter()
         }
 
         val func_list: List<(Any?) -> Any?> = listOf(
@@ -106,7 +109,8 @@ class NewsActivity : AppCompatActivity() {
         this.newsModel.getNews(this.till_timestamp_news, func_list)
 
         if (currentPage < TOTAL_PAGES)
-            adapter.addLoadingFooter()
+            // on first page is not needed the loading footer as we will use our own loading screen
+            // adapter.addLoadingFooter()
         else
             isLastPage = true
 
@@ -116,12 +120,18 @@ class NewsActivity : AppCompatActivity() {
 
         Log.d(TAG, "loadNextPage: $currentPage")
 
+        if (currentPage < TOTAL_PAGES)
+            // adapter.addLoadingFooter()
+        else
+            isLastPage = true
+
         val sublist = newsModel.getList().subList(
                 currentPage*ELEMENTS_BY_PAGE,
                 currentPage*ELEMENTS_BY_PAGE + ELEMENTS_BY_PAGE)
 
 
         val addNews: (Any?) -> Any? = {
+            adapter.removeLoadingFooter()
             /* I have to keep the sublist definition instead of using
              * sublist val here because in the moment I need to use
              * this var, it could be empty (search for more news)
@@ -130,7 +140,7 @@ class NewsActivity : AppCompatActivity() {
             adapter.addAll(newsModel.getList().subList(
                     currentPage*ELEMENTS_BY_PAGE,
                     currentPage*ELEMENTS_BY_PAGE + ELEMENTS_BY_PAGE))
-            adapter.removeLoadingFooter()
+
         }
 
         lateinit var func_list: List<(Any?) -> Any?>
@@ -147,10 +157,6 @@ class NewsActivity : AppCompatActivity() {
             this.newsModel.getNews(this.till_timestamp_news, func_list)
         }
 
-        if (currentPage < TOTAL_PAGES)
-            adapter.addLoadingFooter()
-        else
-            isLastPage = true
 
         isLoading = false
 

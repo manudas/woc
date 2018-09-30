@@ -36,6 +36,9 @@ abstract class PaginationScrollListener
                 // antiguo: && totalItemCount >= totalPageCount) {
 
                 if (dy > 0) { // user scrolled. We don't allow to scroll due to recalculated item height
+
+
+
                     loadMoreItems()
                 }
             }
