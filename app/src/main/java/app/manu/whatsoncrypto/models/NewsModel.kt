@@ -120,6 +120,7 @@ class NewsModel {
     }
 
     private fun downloadFiles_aux_saveBitmap (result_list: List<News>, m: Any?) : Any?  {
+
         val mapa = m as Map<String?, Bitmap?>
         val keys = mapa.keys // it must have only one key
         val url_key = keys.elementAt(0)

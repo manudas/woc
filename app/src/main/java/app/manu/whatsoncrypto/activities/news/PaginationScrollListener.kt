@@ -31,8 +31,13 @@ abstract class PaginationScrollListener
         if (!isLoading && !isLastPage) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount
                     && firstVisibleItemPosition >= 0
-                    && totalItemCount >= totalPageCount) {
-                loadMoreItems()
+                    && totalItemCount < (totalPageCount*visibleItemCount)) {
+
+                // antiguo: && totalItemCount >= totalPageCount) {
+
+                if (dy > 0) { // user scrolled. We don't allow to scroll due to recalculated item height
+                    loadMoreItems()
+                }
             }
         }
         else {

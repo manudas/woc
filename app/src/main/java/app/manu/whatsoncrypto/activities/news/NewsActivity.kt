@@ -28,6 +28,11 @@ class NewsActivity : AppCompatActivity() {
 
     private var isLoading = false
     private var isLastPage = false
+
+    /* SPECIAL NOTE FOR TOTAL_PAGES:
+     * PAGE_START is 0 so it will always have one extra item.
+     * If 3, it will be 0, 1, 2 and 3 (for pages in total)
+     */
     private val TOTAL_PAGES = 3
     private var currentPage = PAGE_START
 
@@ -100,7 +105,7 @@ class NewsActivity : AppCompatActivity() {
 
         this.newsModel.getNews(this.till_timestamp_news, func_list)
 
-        if (currentPage <= TOTAL_PAGES)
+        if (currentPage < TOTAL_PAGES)
             adapter.addLoadingFooter()
         else
             isLastPage = true
@@ -142,7 +147,7 @@ class NewsActivity : AppCompatActivity() {
             this.newsModel.getNews(this.till_timestamp_news, func_list)
         }
 
-        if (currentPage <= TOTAL_PAGES)
+        if (currentPage < TOTAL_PAGES)
             adapter.addLoadingFooter()
         else
             isLastPage = true
