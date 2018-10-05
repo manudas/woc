@@ -2,7 +2,6 @@ package app.manu.whatsoncrypto.activities.news
 
 import app.manu.whatsoncrypto.R
 
-import android.graphics.Movie
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
@@ -11,12 +10,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
-import app.manu.whatsoncrypto.classes.news.News
 import app.manu.whatsoncrypto.models.NewsModel
-import kotlinx.android.synthetic.main.news_item_layout.view.*
+import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
+import android.content.Intent
+import android.content.BroadcastReceiver
+import android.content.Context
 
-// import com.suleiman.pagination.utils.PaginationScrollListener
 
 class NewsActivity : AppCompatActivity() {
 
@@ -36,8 +35,26 @@ class NewsActivity : AppCompatActivity() {
     private val TOTAL_PAGES = 3
     private var currentPage = PAGE_START
 
-    private val newsModel: NewsModel = NewsModel()
+    private val newsModel: NewsModel = NewsModel(this)
     private var till_timestamp_news: Long? = null
+
+    private inner class NewsDataWasUpdatedReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            println("HIT NewsDataWasUpdatedReceiver")
+
+            val intentAction = intent.action
+            if (intentAction == NewsModel.intent_image_attached) {
+
+                val decorView = window.peekDecorView()
+
+                if (decorView.id == R.layout.loading) {
+                    setContentView(R.layout.activity_news_layout)
+                } else {
+                    rv.invalidate()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -104,6 +121,7 @@ class NewsActivity : AppCompatActivity() {
             // it es el parametro, ya que no se especificó otro delante de una flecha ->
             newsModel::cacheNews as (Any?) -> Any?,
             addNews as (Any?) -> Any?
+
         )
 
         this.newsModel.getNews(this.till_timestamp_news, func_list)

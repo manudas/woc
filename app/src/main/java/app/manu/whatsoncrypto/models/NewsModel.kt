@@ -1,5 +1,6 @@
 package app.manu.whatsoncrypto.models
 
+import android.content.Context
 import android.graphics.Bitmap
 import app.manu.whatsoncrypto.classes.news.News
 import org.json.JSONObject
@@ -7,13 +8,19 @@ import org.json.JSONArray
 import app.manu.whatsoncrypto.utils.JSON.JSONParser
 import app.manu.whatsoncrypto.classes.myCustomAsynTask
 import app.manu.whatsoncrypto.utils.bitmaputils.BitmapUtils
+import android.content.Intent
 
 
-class NewsModel {
+
+
+class NewsModel(private val mContext: Context) {
     private lateinit var _coinAPI_BaseUrl: String
     private var _myAsyncMachine: myCustomAsynTask = myCustomAsynTask()
 
     companion object {
+
+        val intent_image_attached = "app.manu.whatsoncrypto.ACTION_IMAGE_ATTACHED"
+
         enum class action (val path: String) {
             NEWS("v2/news/?")
         }
@@ -92,8 +99,13 @@ class NewsModel {
             return {m : Any? -> downloadFiles_aux_saveBitmap(result_l, m)}
         }
 
+        fun n(result_l: List<News>): (Any?) -> Any? {
+            return { unused: Any? -> checkImageNotification(result_l) }
+        }
+
         val onFinish: List<(Any?) -> Any?> = listOf(
-                f(result_list)
+                f(result_list),
+                n(result_list)
         )
         downloadImages(imageUrl, onFinish)
         return result_list
@@ -109,14 +121,46 @@ class NewsModel {
                 url_arr.add(news.imageURL)
             }
             if (url_arr.size > 0) {
-                fun f(result_l: List<News>): (Any?) -> Any? {
+
+                fun f(result_l: List<News>): (Any?) -> Any? { // onFinish, save data into class
                     return { m: Any? -> downloadFiles_aux_saveBitmap(result_l, m) }
                 }
 
-                val onFinishF = listOf(f(list))
+                // onFinish, check if notification to Activity is needed, and notifies
+                fun n(result_l: List<News>): (Any?) -> Any? {
+                    return { unused: Any? -> checkImageNotification(result_l) }
+                }
+
+
+                val onFinishF = listOf(
+                        f(list),
+                        n(list)
+                )
                 downloadImages(url_arr.toTypedArray(), onFinishF, 0, limit)
             }
         }
+    }
+
+
+    private fun notifyViewImageAttached(unused: Any?): Any? {
+        val broadcastIntent = Intent()
+        broadcastIntent.action = intent_image_attached
+        mContext.sendBroadcast(broadcastIntent)
+        return null
+    }
+
+    private fun checkImageNotification(list: List<News>) : Any? {
+        var isDone = true
+        for ((index, news) in list.withIndex()) {
+            if (news.picture == null) {
+                isDone = false
+                break
+            }
+        }
+        if (isDone) {
+            notifyViewImageAttached(null)
+        }
+        return null
     }
 
     private fun downloadFiles_aux_saveBitmap (result_list: List<News>, m: Any?) : Any?  {
