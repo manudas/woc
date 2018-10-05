@@ -129,6 +129,7 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
                 NewsVH.headlineNews.setText(_news.headline)
                 NewsVH.advanceNews.setText(_news.body)
                 NewsVH.urlNews.setText(_news.url)
+                NewsVH.imageNews.setImageBitmap(_news.picture)
 
                 // aqui debemos resolver una promesa:
                 // cuando esté listo el bitmap se asigna
