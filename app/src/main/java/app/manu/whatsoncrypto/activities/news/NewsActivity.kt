@@ -11,10 +11,14 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import app.manu.whatsoncrypto.models.NewsModel
-import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
+
 import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
+import android.support.v4.content.LocalBroadcastManager
+import android.view.LayoutInflater
+import android.view.ViewGroup
 
 
 class NewsActivity : AppCompatActivity() {
@@ -30,15 +34,20 @@ class NewsActivity : AppCompatActivity() {
 
     /* SPECIAL NOTE FOR TOTAL_PAGES:
      * PAGE_START is 0 so it will always have one extra item.
-     * If 3, it will be 0, 1, 2 and 3 (for pages in total)
+     * If 3, it will be 0, 1, 2 and 3 (four pages in total)
      */
     private val TOTAL_PAGES = 3
     private var currentPage = PAGE_START
 
-    private val newsModel: NewsModel = NewsModel(this)
+    private lateinit var newsModel: NewsModel
     private var till_timestamp_news: Long? = null
 
-    private inner class NewsDataWasUpdatedReceiver : BroadcastReceiver() {
+    private lateinit var mLocalBroadcastManager : LocalBroadcastManager
+
+    private var _mRootView: ViewGroup? = null
+
+
+    inner class NewsDataWasUpdatedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             println("HIT NewsDataWasUpdatedReceiver")
 
@@ -46,9 +55,13 @@ class NewsActivity : AppCompatActivity() {
             if (intentAction == NewsModel.intent_image_attached) {
 
                 val decorView = window.peekDecorView()
+                // val rootView = decorView.rootView
 
-                if (decorView.id == R.layout.loading) {
-                    setContentView(R.layout.activity_news_layout)
+                val loading_view = decorView.findViewById( R.id.loading ) as View?
+
+                if (loading_view != null) {
+                // if (rootView.id == R.layout.loading) {
+                    setContentView(_mRootView)
                 } else {
                     rv.invalidate()
                 }
@@ -60,10 +73,22 @@ class NewsActivity : AppCompatActivity() {
 
         till_timestamp_news = System.currentTimeMillis()/1000
 
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_news_layout)
+        newsModel = NewsModel(this)
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this)
 
-        rv = findViewById<View>(R.id.newsDataContainer) as RecyclerView
+        // we register the broadcast receiver for image attached
+        val br = NewsDataWasUpdatedReceiver()
+        val intentf = IntentFilter(NewsModel.intent_image_attached)
+        // and finally we register the broadcast receiver within our app
+        mLocalBroadcastManager.registerReceiver(br, intentf)
+
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.loading)
+
+        val inflater: LayoutInflater =  this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        _mRootView = inflater.inflate(R.layout.activity_news_layout, null) as ViewGroup?
+
+        rv = _mRootView!!.findViewById<View>(R.id.newsDataContainer) as RecyclerView
         // progressBar = findViewById<View>(R.id.newsProgressBar) as ProgressBar
 
         adapter = PaginationAdapter(this, ELEMENTS_BY_PAGE)

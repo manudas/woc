@@ -11,12 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_wc_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".activities.news.NewsActivity" >
-            <intent-filter>
-                <action android:name="app.manu.whatsoncrypto.ACTION_IMAGE_ATTACHED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/plain"/>
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

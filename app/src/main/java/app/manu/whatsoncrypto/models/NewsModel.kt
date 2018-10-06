@@ -9,13 +9,13 @@ import app.manu.whatsoncrypto.utils.JSON.JSONParser
 import app.manu.whatsoncrypto.classes.myCustomAsynTask
 import app.manu.whatsoncrypto.utils.bitmaputils.BitmapUtils
 import android.content.Intent
-
-
+import android.support.v4.content.LocalBroadcastManager
 
 
 class NewsModel(private val mContext: Context) {
     private lateinit var _coinAPI_BaseUrl: String
     private var _myAsyncMachine: myCustomAsynTask = myCustomAsynTask()
+    private val mLocalBroadcastManager : LocalBroadcastManager = LocalBroadcastManager.getInstance(mContext)
 
     companion object {
 
@@ -95,19 +95,28 @@ class NewsModel(private val mContext: Context) {
 
         }
 
+        var total_downloads = 0
+        val new_list = mutableListOf<News>()
         fun f(result_l: MutableList<News>) : (Any?) -> Any? {
-            return {m : Any? -> downloadFiles_aux_saveBitmap(result_l, m)}
+            return {
+                m : Any? ->
+                    new_list.add(downloadFiles_aux_saveBitmap(result_l, m) as News)
+            }
         }
 
-        fun n(result_l: List<News>): (Any?) -> Any? {
-            return { unused: Any? -> checkImageNotification(result_l) }
+        fun n(result_l: MutableList<News>) : (Any?) -> Any? {
+            return {m : Any? ->
+                if (new_list.size == total_downloads){
+                    checkImageNotification(new_list)
+                }
+            }
         }
 
         val onFinish: List<(Any?) -> Any?> = listOf(
                 f(result_list),
-                n(result_list)
+                n(new_list)
         )
-        downloadImages(imageUrl, onFinish)
+        total_downloads = downloadImages(imageUrl, onFinish)
         return result_list
     }
 
@@ -143,9 +152,11 @@ class NewsModel(private val mContext: Context) {
 
 
     private fun notifyViewImageAttached(unused: Any?): Any? {
+        println("HIT notifyViewImageAttached")
         val broadcastIntent = Intent()
         broadcastIntent.action = intent_image_attached
-        mContext.sendBroadcast(broadcastIntent)
+        // habría que investiga sendOrderedBroadcast
+        mLocalBroadcastManager.sendBroadcast(broadcastIntent)
         return null
     }
 
@@ -169,21 +180,23 @@ class NewsModel(private val mContext: Context) {
         val keys = mapa.keys // it must have only one key
         val url_key = keys.elementAt(0)
         val value = mapa.get(url_key)
+        var selected_news: News? = null
         if (value != null) {
             for (news in result_list){
                 if (news.imageURL == url_key) {
                     news.picture = value
+                    selected_news = news
                     break
                 }
             }
         }
-        return null
+        return selected_news
     }
 
     private fun downloadImages(url_arr: Array<String?>,
                                onFinish: List<(Any?) -> Any?>,
                                offset: Int = 0,
-                               limit: Int = 10) {
+                               limit: Int = 10) : Int {
 
 
         val index_from = offset*limit
@@ -205,5 +218,6 @@ class NewsModel(private val mContext: Context) {
             this._myAsyncMachine.resetCoreFunctions(listOf(function_to_exec), i)
             this._myAsyncMachine.execute(i)
         }
+        return needed_resources
     }
 }
