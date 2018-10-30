@@ -222,7 +222,5 @@ class NewsActivity : AppCompatActivity() {
 
         private val ELEMENTS_BY_PAGE = 6
     }
-
-
 }
 

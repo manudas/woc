@@ -5,4 +5,6 @@
     <string name="title_activity_coin_market_details">CoinMarketDetails</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_news_details">NewsDetails</string>
 </resources>

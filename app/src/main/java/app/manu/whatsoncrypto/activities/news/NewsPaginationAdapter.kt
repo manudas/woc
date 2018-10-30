@@ -3,6 +3,7 @@ package app.manu.whatsoncrypto.activities.news
 import app.manu.whatsoncrypto.R
 
 import android.content.Context
+import android.content.Intent
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+
 import app.manu.whatsoncrypto.classes.news.News
 
 import java.util.ArrayList
@@ -218,15 +220,36 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
         val urlNews: TextView
         val imageNews: ImageView
 
+        val readNews: ImageView
+
         init {
 
             headlineNews = itemView.findViewById(R.id.headlineNews) as TextView
             advanceNews = itemView.findViewById(R.id.advanceNews) as TextView
             urlNews = itemView.findViewById(R.id.urlNews) as TextView
             imageNews = itemView.findViewById(R.id.imageNews) as ImageView
+            readNews = itemView.findViewById(R.id.read_icon)
+
+            assingReadMoreClickEvent()
+        }
+
+        private fun assingReadMoreClickEvent() {
+            readNews.setOnClickListener(this::showDetails)
+        }
+
+
+        private fun showDetails(v: View): Unit {
+            /*
+             * 1 - Coger nueva clase tipo webview (SERA UNA ACTIVITY)
+             * 2 - Invocar nueva activity de tipo webview pasandole la url
+             * 3 - Algo más?
+             */
+
+            val myIntent = Intent(context, NewsDetailsActivity::class.java)
+            myIntent.putExtra("news_url", this.urlNews.text) //Optional parameters
+            context.startActivity(myIntent)
         }
     }
-
 
     protected inner class LoadingVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 
