@@ -17,8 +17,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v4.widget.DrawerLayout
+
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 
 
 class NewsActivity : AppCompatActivity() {
@@ -44,8 +49,11 @@ class NewsActivity : AppCompatActivity() {
 
     private lateinit var mLocalBroadcastManager : LocalBroadcastManager
 
-    private var _mRootView: ViewGroup? = null
+    private var _mRootView: View? = null
 
+    private var _mViewStub: FrameLayout? = null // ROOT view to attach elements inside te DrawerLayout
+    private var _mDrawer: DrawerLayout? = null
+    private var _mMenuView: ImageView? = null
 
     inner class NewsDataWasUpdatedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -61,7 +69,8 @@ class NewsActivity : AppCompatActivity() {
 
                 if (loading_view != null) {
                 // if (rootView.id == R.layout.loading) {
-                    setContentView(_mRootView)
+                    setContentView(_mRootView!!)
+                    initDrawer()
                 } else {
                     rv.invalidate()
                 }
@@ -70,6 +79,8 @@ class NewsActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
 
         till_timestamp_news = System.currentTimeMillis()/1000
 
@@ -82,7 +93,9 @@ class NewsActivity : AppCompatActivity() {
         // and finally we register the broadcast receiver within our app
         mLocalBroadcastManager.registerReceiver(br, intentf)
 
-        super.onCreate(savedInstanceState)
+        super.setContentView(R.layout.app_base_layout_with_drawer_menu) // The base layout that contains your navigation drawer.
+        _mViewStub = findViewById(R.id.view_stub) as FrameLayout
+
         setContentView(R.layout.loading)
 
         val inflater: LayoutInflater =  this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -130,6 +143,7 @@ class NewsActivity : AppCompatActivity() {
 
         // mocking network delay for API call
         Handler().postDelayed({ loadFirstPage() }, 1000)
+
     }
 
 
@@ -213,6 +227,49 @@ class NewsActivity : AppCompatActivity() {
         }
 
     }
+
+
+    /* Override all setContentView methods to put the content view to the FrameLayout view_stub
+     * so that, we can make other activity implementations looks like normal activity subclasses.
+     */
+    override fun setContentView(layoutResID: Int) {
+        if (_mViewStub != null) {
+            val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val lp = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT)
+            val stubView = inflater.inflate(layoutResID, _mViewStub, false)
+            _mViewStub!!.addView(stubView, lp)
+        }
+    }
+
+    override fun setContentView(view: View) {
+        if (_mViewStub != null) {
+            val lp = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT)
+            _mViewStub!!.addView(view, lp)
+        }
+    }
+
+    override fun setContentView(view: View, params: ViewGroup.LayoutParams) {
+        if (_mViewStub != null) {
+            _mViewStub!!.addView(view, params)
+        }
+    }
+
+    private fun initDrawer() {
+        _mDrawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+
+        _mMenuView = findViewById<ImageView>(R.id.menuView)
+        _mMenuView!!.setOnClickListener {_mDrawer!!.openDrawer(Gravity.START)}
+
+        /*
+        toggle = ActionBarDrawerToggle(this, _mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer.addDrawerListener(toggle)
+        */
+    }
+
 
     companion object {
 

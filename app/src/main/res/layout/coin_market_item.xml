@@ -104,7 +104,9 @@
                 android:layout_height="match_parent"
                 android:gravity="center|end"
                 android:padding="10dp"
-                app:srcCompat="@drawable/coin_details" />
+                app:srcCompat="@drawable/coin_details"
+                android:src="@drawable/coin_details"
+                />
 
         </RelativeLayout>
     </LinearLayout>

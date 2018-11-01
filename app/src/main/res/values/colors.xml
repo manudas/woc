@@ -4,4 +4,6 @@
     <color name="borderColorWhatsOnCrypto">#F89D1E</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="blueTransparentWhatsOnCrypto">#80282561</color>
 </resources>
