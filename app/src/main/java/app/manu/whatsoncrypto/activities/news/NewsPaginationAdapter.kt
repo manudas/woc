@@ -1,10 +1,7 @@
 package app.manu.whatsoncrypto.activities.news
 
-import app.manu.whatsoncrypto.R
-
 import android.content.Context
 import android.content.Intent
-
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +9,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-
+import app.manu.whatsoncrypto.R
 import app.manu.whatsoncrypto.classes.news.News
-
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.ceil
 
 /**
@@ -61,9 +57,9 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
         return viewHolder!!
     }
 
-    private fun calculateLayoutParams(parent: ViewGroup, view: View){
+    private fun calculateLayoutParams(parent: ViewGroup, view: View) {
 
-        val layoutParams : ViewGroup.LayoutParams = view.layoutParams
+        val layoutParams: ViewGroup.LayoutParams = view.layoutParams
         val params = LinearLayout.LayoutParams(
                 layoutParams
         )
@@ -74,25 +70,23 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
         // as the sum of margins are 0.1, the height factor must be 0.9 so te sum of all is 1
         val heightFactor = 0.9
         // bottomMarginFactor + topMarginFactor should the rest of the sums of the layout heights
-        val bottomMarginFactor = 1-heightFactor
+        val bottomMarginFactor = 1 - heightFactor
 
-        val topMargin : Int =  0
+        val topMargin: Int = 0
 
         var bottomMarginDouble = (parent.height / elements_by_page_to_hide_one_element_in_Bottom) * bottomMarginFactor
 
         var bottomMargin = if (isFirst) {
             ceil(bottomMarginDouble).toInt()
-        }
-        else {
+        } else {
             ((parent.height / elements_by_page_to_hide_one_element_in_Bottom) * bottomMarginFactor).toInt()
         }
 
         params.setMargins(0, topMargin, 0, bottomMargin)
 
-        var height = if (isFirst){
+        var height = if (isFirst) {
             ceil(parent.height * heightFactor / elements_by_page_to_hide_one_element_in_Bottom).toInt()
-        }
-        else {
+        } else {
             (parent.height * heightFactor / elements_by_page_to_hide_one_element_in_Bottom).toInt()
         }
 
@@ -101,27 +95,14 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
     }
 
     private fun getViewHolder(parent: ViewGroup, inflater: LayoutInflater): RecyclerView.ViewHolder {
-        /*
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View itemView = inflater.inflate(R.layout.itemview, parent, false);
-
-            ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
-            layoutParams.height = (int) (parent.getHeight() * 0.1);
-            itemView.setLayoutParams(layoutParams);
-
-            return new MyViewHolder(itemView)
-         */
         val viewHolder: RecyclerView.ViewHolder
         val v1 = inflater.inflate(R.layout.news_item_layout, parent, false)
-
         calculateLayoutParams(parent, v1)
-
         viewHolder = NewsVH(v1)
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
         val _news = news!![position]
 
         when (getItemViewType(position)) {
@@ -137,10 +118,9 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
                 // cuando esté listo el bitmap se asigna
 
             }
-            LOADING -> {
+            LOADING -> { // Do nothing
             }
-        }//                Do nothing
-
+        }
     }
 
     override fun getItemCount(): Int {
@@ -152,9 +132,8 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
     }
 
     /*
-   Helpers
-   _________________________________________________________________________________________________
-    */
+     * Helpers
+     */
 
     fun add(n: News) {
         news!!.add(n)
@@ -182,7 +161,6 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
         }
     }
 
-
     fun addLoadingFooter() {
         isLoadingAdded = true
         // dummy News to add the loading footer
@@ -205,11 +183,9 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
         return news!![position]
     }
 
-
     /*
-   View Holders
-   _________________________________________________________________________________________________
-    */
+     * View Holders
+     */
 
     /**
      * Main list's content ViewHolder
@@ -237,7 +213,6 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
             readNews.setOnClickListener(this::showDetails)
         }
 
-
         private fun showDetails(v: View): Unit {
             /*
              * 1 - Coger nueva clase tipo webview (SERA UNA ACTIVITY)
@@ -254,10 +229,7 @@ class PaginationAdapter(private val context: Context, private val elements_by_pa
     protected inner class LoadingVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     companion object {
-
         private val ITEM = 0
         private val LOADING = 1
     }
-
-
 }

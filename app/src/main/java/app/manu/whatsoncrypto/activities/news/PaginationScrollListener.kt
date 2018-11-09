@@ -1,6 +1,5 @@
 package app.manu.whatsoncrypto.activities.news
 
-
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 
@@ -31,24 +30,16 @@ abstract class PaginationScrollListener
         if (!isLoading && !isLastPage) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount
                     && firstVisibleItemPosition >= 0
-                    && totalItemCount < (totalPageCount*visibleItemCount)) {
-
-                // antiguo: && totalItemCount >= totalPageCount) {
+                    && totalItemCount < (totalPageCount * visibleItemCount)) {
 
                 if (dy > 0) { // user scrolled. We don't allow to scroll due to recalculated item height
-
-
-
                     loadMoreItems()
                 }
             }
+        } else {
+            val breakpoint = "";
         }
-        else {
-            val breakpoint="";
-        }
-
     }
 
     protected abstract fun loadMoreItems()
-
 }

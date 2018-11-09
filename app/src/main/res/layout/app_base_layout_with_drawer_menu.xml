@@ -21,5 +21,7 @@
         app:menu="@menu/main_drawer_menu"
         app:headerLayout="@layout/nav_header_drawer_menu"
         android:background="@color/blueTransparentWhatsOnCrypto"
+        app:itemTextColor="@color/textColorWhatsOnCrypto"
+        app:itemIconTint="@color/textColorWhatsOnCrypto"
         />
 </android.support.v4.widget.DrawerLayout>
