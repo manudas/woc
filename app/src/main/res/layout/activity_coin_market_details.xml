@@ -8,13 +8,6 @@
     android:id="@+id/coinMarketActivity"
     android:background="#131A24">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/top_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <LinearLayout
         android:id="@+id/coinMarketCapTitleLinearLayout"
         android:layout_width="0dp"
@@ -26,7 +19,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/coinMarketCapTitle"
@@ -57,6 +50,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/borders"
         android:gravity="center_vertical"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -68,7 +62,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_weight="0.1"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp">
             <!-- layout_weight per line 0,0667 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,13 +75,15 @@
                 <RelativeLayout
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.15">
+                    android:layout_weight="0.15"
+                    android:gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/coin_logo_details"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:fontFamily="@font/cryptofont_webfont"
+                        android:gravity="center_vertical"
                         android:text="LOGO MONEDA"
                         android:textColor="@color/textColorWhatsOnCrypto"
                         android:textSize="@dimen/extra_big_font"
@@ -100,10 +100,11 @@
                         android:id="@+id/coin_name_details"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center_vertical"
                         android:text="NOMBRE MONEDA"
                         android:textAllCaps="true"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/big_font"
+                        android:textSize="@dimen/extra_big_font"
                         android:textStyle="bold" />
 
                 </RelativeLayout>
@@ -115,7 +116,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.0667"
-            android:gravity="end">
+            android:gravity="end"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp">
             <!-- layout_weight per line 0,0667 -->
 
             <TextView
@@ -133,13 +138,18 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_weight="0.0667"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp">
             <!-- layout_weight per line 0,0667 -->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="end">
+
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
@@ -166,7 +176,6 @@
             </LinearLayout>
 
 
-
         </RelativeLayout>
 
         <!-- grapview -> 6 lines more or less -> 0.0667 * 6 -->
@@ -187,7 +196,15 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_marginTop="15dp"
+            android:layout_weight="0.070033333"
+            android:background="@drawable/borders"
+            android:paddingBottom="5dp"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="5dp">
             <!-- layout_weight per line 0,0667 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -199,14 +216,15 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="start"
                     android:layout_weight="0.3"
-                    android:gravity="center">
+                    android:gravity="left|start">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center_vertical"
                         android:text="MARKET CAP"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/big_font" />
+                        android:textSize="@dimen/standard_font" />
 
                 </RelativeLayout>
 
@@ -250,7 +268,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_weight="0.070033333"
+            android:background="@drawable/borders"
+            android:paddingBottom="5dp"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="5dp">
             <!-- layout_weight per line 0,0667 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -267,9 +292,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center_vertical"
                         android:text="VOLUME (24H)"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/big_font" />
+                        android:textSize="@dimen/standard_font" />
 
                 </RelativeLayout>
 
@@ -313,7 +339,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_weight="0.0556"
+            android:background="@drawable/borders"
+            android:paddingBottom="5dp"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="5dp">
             <!-- layout_weight per line 0,0667 -->
 
             <LinearLayout
@@ -323,14 +356,16 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.3">
+                    android:layout_weight="0.3"
+                    android:gravity="left|start">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="CIRCULATING SUPLY"
+                        android:gravity="center_vertical"
+                        android:text="CIRCULATING"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/big_font" />
+                        android:textSize="@dimen/standard_font" />
 
                 </RelativeLayout>
 
@@ -357,7 +392,15 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_weight="0.0556"
+            android:background="@drawable/borders"
+            android:paddingBottom="5dp"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="5dp"
+            android:visibility="invisible">
             <!-- layout_weight per line 0,0667 -->
 
             <LinearLayout
@@ -367,14 +410,15 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.3">
+                    android:layout_weight="0.3"
+                    android:gravity="left|start">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="MAX SUPLY"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/big_font" />
+                        android:textSize="@dimen/standard_font" />
 
                 </RelativeLayout>
 
@@ -400,13 +444,20 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667"></RelativeLayout>
+            android:layout_weight="0.0456"></RelativeLayout>
 
         <!-- back arrow -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0667">
+            android:layout_weight="0.070033333"
+            android:background="@drawable/borders"
+            android:paddingBottom="2dp"
+            android:paddingEnd="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingStart="8dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -414,13 +465,15 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.2">
+                    android:layout_weight="0.2"
+                    android:paddingBottom="2sp"
+                    android:paddingTop="2sp">
                     <!-- back arrow image -->
                     <ImageView
+                        android:id="@+id/newsBackButton"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/back_icon"
                         app:srcCompat="@drawable/back_icon" />
 
                 </RelativeLayout>
@@ -433,8 +486,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center_vertical"
                         android:text="GO BACK"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/standard_font"
+                        android:textStyle="bold" />
 
                 </RelativeLayout>
             </LinearLayout>

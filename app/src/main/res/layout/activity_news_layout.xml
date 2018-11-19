@@ -7,12 +7,6 @@
     android:id="@+id/coinMarketActivity"
     android:background="#131A24">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/top_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/newsTitleLinearLayout"
@@ -20,12 +14,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/newsTitle"

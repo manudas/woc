@@ -1,6 +1,7 @@
 package app.manu.whatsoncrypto.classes.coin
 
 import android.util.SparseArray
+import java.lang.Math.abs
 import java.util.*
 
 class Coin (name: String?) {
@@ -160,7 +161,7 @@ class Coin (name: String?) {
     }
 
     var name = name
-        get() = this.name
+        get() = field
         set(value: String?) {
             if (this.name == null) {
                 field = value
@@ -176,21 +177,21 @@ class Coin (name: String?) {
     // public val lastPrice: MutableMap <String, Double> = mutableMapOf<String, Double>() // USD, EUR and so on
 
     var fullName: String? = null
-        get() = this.fullName
+        get() = field
         set(value: String?) {
             if (this.fullName == null) {
                 field = value
             }
         }
 
-    private var supply: Long
-        get() = this.supply
-        set(value: Long) {
+    private var supply: Long? = null
+        get() = field
+        set(value: Long?) {
             supply = value
         }
-    private var maxSupply: Long
-        get() = this.maxSupply
-        set(value: Long) {
+    private var maxSupply: Long? = null
+        get() = field
+        set(value: Long?) {
             maxSupply = value
         }
 
@@ -205,6 +206,10 @@ class Coin (name: String?) {
      */
     public fun addHistorical(toSym: String, dataPriceMap: MutableMap<String, Any?>, period: Companion.price_period = price_period.MINUTE) {
 
+
+        if (!historical.contains(toSym)) {
+            historical[toSym] = CoinHistorical()
+        }
 
         // historical[toSym]!![period]
         var toSymbolMap = historical[toSym]!![period]
@@ -257,6 +262,7 @@ class Coin (name: String?) {
                 _time = time
             }
             if (_time != null) {
+                /*
                 var min_resolution_in_milliseconds =
                         if (period == Coin.Companion.price_period.MINUTE) {
                             60 /* seconds */ * 1000 /* milliseconds each second */
@@ -271,6 +277,10 @@ class Coin (name: String?) {
                 val roundedTime = ((_time + min_resolution_in_milliseconds / 2) / 1000) * 1000
 
                 val price_map = toSymbolMap[roundedTime]
+                */
+                val price_map = toSymbolMap[_time]
+
+
                 if (price_map != null) {
                     price_or_historical_value = price_map[value].toString()
                     if ((price_or_historical_value == null) && (value == "price")) {
@@ -292,6 +302,7 @@ class Coin (name: String?) {
         return price_or_historical_value
     }
 
+
     /**
      * Useful to find last recorded values of some
      * entries such as Market Capitalization and
@@ -309,5 +320,76 @@ class Coin (name: String?) {
             }
         }
         return null
+    }
+
+    public fun aggregateValuesFromHistorical(
+                        toSym: String,
+                        howLongFromTimeTo: Long = price_period.DAILY.time_lapse_in_seconds.toLong(),
+                        timeTo: Long? = null,
+                        value: String,
+                        decimals: Int = 3,
+                        period : price_period = price_period.MINUTE) : Double?
+    {
+
+        var toSymbolMap = historical[toSym]!![period]
+        val keys = toSymbolMap!!.keys.toTypedArray().reversedArray() // reversed array to start for the last item
+
+        var _valueResult: Double? = null
+
+        var _timeTo : Long? = timeTo
+        if (_timeTo == null) {
+            _timeTo = keys[0]
+        }
+
+        if (_timeTo != null) {
+            var _timeFrom = _timeTo - howLongFromTimeTo
+            _timeFrom = findNearestHistoricalTime(toSym, _timeFrom, period)?.let { it } ?: -1L
+            if (_timeFrom != -1L) {
+                _valueResult = .0
+                for (time in keys) {
+                    if (time > _timeTo) {
+                        continue
+                    } else if (time < _timeFrom) {
+                        break
+                    }
+
+                    _valueResult += toSymbolMap[time]!![value].toString().toDouble()
+                }
+
+                val decimal_factor = Math.pow(10.0, decimals.toDouble())
+                _valueResult *= decimal_factor
+                _valueResult = Math.round(_valueResult).toDouble()
+                _valueResult /= decimal_factor
+            }
+        }
+        return _valueResult
+    }
+
+    public fun findNearestHistoricalTime(toSym: String, time: Long, period : price_period = price_period.MINUTE): Long? {
+        var toSymbolMap = historical[toSym]!![period]
+        val keys = toSymbolMap!!.keys.toTypedArray().reversedArray() // reversed array to start for the last item
+
+        var higher : Long? = null
+        var lower : Long ? = null
+
+        for (current_time in keys) {
+            if (higher == null) {
+                higher = current_time
+            }
+            if (lower == null) {
+                lower = current_time
+            }
+            if (time <= higher!! && time >= lower!!) {
+                break // we found our desired result
+            }
+            else {
+                higher = lower
+                lower = current_time // as is a descendent array, from bigger to lower
+            }
+        }
+        var winner = if (higher != null && lower != null)
+                                if (abs(time-higher!!) < abs(time-lower!!)) higher else lower
+                            else null
+        return winner
     }
 }

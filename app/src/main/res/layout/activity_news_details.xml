@@ -8,12 +8,6 @@
     android:id="@+id/newsDetailsActivity"
     android:background="#131A24">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/top_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/coinDataContainer"
@@ -28,14 +22,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include">
+        app:layout_constraintTop_toTopOf="parent">
 
         <WebView
             android:id="@+id/newsWebView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.9333"
-            ></WebView>
+            android:layout_weight="0.9333"></WebView>
 
         <!-- back arrow -->
         <LinearLayout
@@ -59,8 +52,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        app:srcCompat="@drawable/back_icon"
-                        />
+                        app:srcCompat="@drawable/back_icon" />
 
                 </RelativeLayout>
 

@@ -5,7 +5,7 @@ import android.os.Handler
 import android.view.View
 import android.support.v7.app.AppCompatActivity
 
-class MainActivity : AppCompatActivity() {
+class ExampleMainActivity : AppCompatActivity() {
 
     private val mHideHandler = Handler()
     private val mHideRunnable = Runnable { hideSystemUI() }

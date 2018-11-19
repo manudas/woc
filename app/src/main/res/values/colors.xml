@@ -2,8 +2,10 @@
 <resources>
     <color name="textColorWhatsOnCrypto">#f89d1e</color>
     <color name="borderColorWhatsOnCrypto">#F89D1E</color>
-
     <color name="black_overlay">#66000000</color>
 
     <color name="blueTransparentWhatsOnCrypto">#80282561</color>
+
+    <color name="bgColorMenuWhatsOnCrypto">#80f89d1e</color>
+    <color name="bgColorTransparentMenuWhatsOnCrypto">#00f89d1e</color>
 </resources>

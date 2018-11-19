@@ -22,12 +22,7 @@ class CoinHistorical :
              */
             override fun next(): MutableMap<String, Any?> {
                 var next_index: Long?  = null
-                next_index = if (this.current_index == null) {
-                    this.findFirstIndex()
-                }
-                else {
-                    this.findNextIndex(true)
-                }
+                next_index = this.findNextIndex(true)
                 if (next_index != null) {
                     val price_period_values = Coin.Companion.price_period.values()
 
@@ -48,37 +43,54 @@ class CoinHistorical :
              * to save the found index as the next index or not
              */
             private fun findNextIndex(saveResult: Boolean = true) : Long ? {
+
+                var selectedIndex: Long? = null
                 if (this.current_index == null) {
-                    return this.findFirstIndex()
+                    selectedIndex = this.findFirstIndex()
+                    if (saveResult) {
+                        this.current_index = selectedIndex
+                    }
                 }
+                else {
+                    val price_period_values = Coin.Companion.price_period.values()
+                    val array_result = arrayOf<Long>(0L, 0L, 0L)
 
-                val price_period_values = Coin.Companion.price_period.values()
-                val array_result = arrayOf<Long>(0L, 0L, 0L)
-
-                var index = 0;
-                for (period in price_period_values) {
-                    val period_map = historicalObject[period]
-                    val keySet = period_map?.keys
-                    if (keySet != null) {
-                        for (key in keySet) {
-                            if (key < this.current_index!!) {
-                                continue
-                            } else {
-                                array_result[index] = key
+                    var index = 0;
+                    for (period in price_period_values) {
+                        val period_map = historicalObject[period]
+                        val keySet = period_map?.keys
+                        if (keySet != null) {
+                            for (key in keySet) {
+                                if (key <= this.current_index!!) {
+                                    continue
+                                } else {
+                                    array_result[index] = key
+                                    break
+                                }
                             }
                         }
+                        index++
                     }
-                    index++
-                }
 
-                Arrays.sort(array_result)
-                if (array_result[0] == 0L) {
-                    return null
+                    Arrays.sort(array_result)
+                    var pre_result: Long = 0L
+                    for (time in array_result) {
+                        if (time != 0L) {
+                            pre_result = time
+                            break
+                        }
+                    }
+
+                    if (pre_result == 0L) {
+                        selectedIndex = null
+                    } else {
+                        selectedIndex = pre_result
+                    }
+                    if (saveResult) {
+                        this.current_index = selectedIndex
+                    }
                 }
-                else if (saveResult){
-                    this.current_index = array_result[0]
-                }
-                return array_result[0]
+                return selectedIndex
             }
 
 

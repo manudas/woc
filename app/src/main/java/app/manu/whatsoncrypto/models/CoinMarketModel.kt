@@ -272,7 +272,7 @@ class CoinMarketModel {
                 dataPriceMap["volume"] = volume
                 dataPriceMap["price_period"] = Coin.Companion.price_period.DAILY
 
-                coin.addHistorical(coin_name, dataPriceMap)
+                coin.addHistorical(key_currency, dataPriceMap)
 
                 if (current_price != null) {
                     // ARREGLAR ESTO coin.lastPrice = current_price

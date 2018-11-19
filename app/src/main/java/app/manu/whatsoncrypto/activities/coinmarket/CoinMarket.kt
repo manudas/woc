@@ -149,12 +149,15 @@ class CoinMarket : BaseCompatActivity() {
          *
          */
 
-        val price = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "price") as Double
+        val price = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "price").toString().toDoubleOrNull()
 
         coin_price_textview.text = price.toString() + " " + Coin.getSymbol(SelectedCurrencyTo)
 
-        val open = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "open") as Double
-        var percentage_change = 100 - ( open * 100 / price)
+        var open = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "open").toString().toDoubleOrNull()
+        if (open == null) {
+            open = .0
+        }
+        var percentage_change = price?.let{ 100 - ( open * 100 / price)} ?: .0
 
         // rounding to two decimal places
         percentage_change *= 100

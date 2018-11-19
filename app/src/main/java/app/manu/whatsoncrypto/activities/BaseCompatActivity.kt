@@ -1,19 +1,21 @@
 package app.manu.whatsoncrypto.activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.NavigationView
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
+import app.manu.whatsoncrypto.CoinMarket
 import app.manu.whatsoncrypto.R
+import app.manu.whatsoncrypto.activities.news.NewsActivity
+import kotlin.reflect.KClass
 
-open class BaseCompatActivity: AppCompatActivity() {
+open class BaseCompatActivity: AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val mHideHandler = Handler()
     private val mHideRunnable = Runnable { hideSystemUI() }
@@ -21,11 +23,16 @@ open class BaseCompatActivity: AppCompatActivity() {
     protected var _mViewStub: FrameLayout? = null // ROOT view to attach elements inside te DrawerLayout
     private var _mDrawer: DrawerLayout? = null
     private var _mMenuView: ImageView? = null
+    private var _mDrawerRoot: NavigationView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // The base layout that contains your navigation drawer
         super.setContentView(R.layout.app_base_layout_with_drawer_menu)
+        _mViewStub = findViewById<FrameLayout>(R.id.view_stub)
+        _mDrawerRoot = findViewById(R.id.navigation_view)
+
+        initDrawer()
 
         val decorView = window.decorView
         decorView.setOnSystemUiVisibilityChangeListener { visibility ->
@@ -51,6 +58,7 @@ open class BaseCompatActivity: AppCompatActivity() {
      */
     override fun setContentView(layoutResID: Int) {
         if (_mViewStub != null) {
+            checkNavBar(layoutResID)
             val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val lp = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -62,6 +70,7 @@ open class BaseCompatActivity: AppCompatActivity() {
 
     override fun setContentView(view: View) {
         if (_mViewStub != null) {
+            checkNavBar(view.id)
             _mViewStub!!.removeAllViews()
             val lp = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -72,14 +81,19 @@ open class BaseCompatActivity: AppCompatActivity() {
 
     override fun setContentView(view: View, params: ViewGroup.LayoutParams) {
         if (_mViewStub != null) {
+            checkNavBar(view.id)
             _mViewStub!!.addView(view, params)
         }
     }
 
     protected fun initDrawer() {
-        _mDrawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+        _mDrawer = findViewById<DrawerLayout>(R.id.drawer_layout) as DrawerLayout
         _mMenuView = findViewById<ImageView>(R.id.menuView)
         _mMenuView!!.setOnClickListener {_mDrawer!!.openDrawer(Gravity.START)}
+
+        if (_mDrawerRoot != null) {
+            _mDrawerRoot!!.setNavigationItemSelectedListener(this)
+        }
     }
 
     private fun delayedHide(delayMillis: Int) {
@@ -121,4 +135,52 @@ open class BaseCompatActivity: AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
+
+    override fun onBackPressed() {
+        if (this._mDrawer!!.isDrawerVisible(_mDrawerRoot!! as View)) {
+            this._mDrawer!!.closeDrawer(_mDrawerRoot!! as View, true)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun checkNavBar(newLayout: Int){
+        val navBar = findViewById<View>(R.id.included_top_bar)
+        if (newLayout == R.layout.loading) {
+            navBar.visibility = View.GONE
+        }
+        else { //
+            navBar.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.nav_item_news -> {
+            // User chose the "News" item, show the News Activity ...
+            openActivity(NewsActivity::class)
+            true
+        }
+
+        R.id.nav_item_coinmarketcap -> {
+            // User chose the "Coin Market CAP" action, open Coin Market CAP Activity
+            openActivity(CoinMarket::class)
+            true
+        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            false
+            // super.onNavigationItemSelected(item)
+        }
+    }
+
+    private fun openActivity(newActivity: KClass<*>): Unit {
+        if (newActivity != this::class) {
+            val myIntent = Intent(this, newActivity.java)
+            this.startActivity(myIntent)
+        }
+    }
 }
+
+

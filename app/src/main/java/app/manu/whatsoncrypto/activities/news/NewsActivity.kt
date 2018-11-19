@@ -61,7 +61,7 @@ class NewsActivity : BaseCompatActivity() {
                 if (loading_view != null) {
                     // if (rootView.id == R.layout.loading) {
                     setContentView(_mRootView!!)
-                    initDrawer()
+                    // initDrawer()
                 } else {
                     rv.invalidate()
                 }
@@ -83,8 +83,6 @@ class NewsActivity : BaseCompatActivity() {
         val intentf = IntentFilter(NewsModel.intent_image_attached)
         // and finally we register the broadcast receiver within our app
         mLocalBroadcastManager.registerReceiver(br, intentf)
-
-        _mViewStub = findViewById(R.id.view_stub) as FrameLayout
 
         setContentView(R.layout.loading)
 

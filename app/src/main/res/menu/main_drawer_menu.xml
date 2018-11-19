@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <group>
-        <item android:id="@+id/nav_item_news"
+        <item
+            android:id="@+id/nav_item_news"
             android:icon="@drawable/news_menu_icon"
-            android:title="NEWS"
-            />
+            android:title="NEWS" />
         <item android:id="@+id/nav_item_coinmarketcap"
             android:icon="@drawable/coin_market_cap_icon"
             android:title="COIN MARKET CAP"

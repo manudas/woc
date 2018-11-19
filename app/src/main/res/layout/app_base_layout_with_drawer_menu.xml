@@ -6,22 +6,47 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
-        android:id="@+id/view_stub"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-    </FrameLayout>
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/coinMarketActivity"
+        android:background="#131A24">
+
+
+        <include
+            android:id="@+id/included_top_bar"
+            layout="@layout/top_bar"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/view_stub"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/included_top_bar">
+
+        </FrameLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:menu="@menu/main_drawer_menu"
-        app:headerLayout="@layout/nav_header_drawer_menu"
+        android:layout_gravity="left"
         android:background="@color/blueTransparentWhatsOnCrypto"
-        app:itemTextColor="@color/textColorWhatsOnCrypto"
+        app:headerLayout="@layout/nav_header_drawer_menu"
+        app:itemBackground="@drawable/menu_item_color"
         app:itemIconTint="@color/textColorWhatsOnCrypto"
-        />
+        app:itemTextColor="@color/textColorWhatsOnCrypto"
+        app:menu="@menu/main_drawer_menu" />
 </android.support.v4.widget.DrawerLayout>

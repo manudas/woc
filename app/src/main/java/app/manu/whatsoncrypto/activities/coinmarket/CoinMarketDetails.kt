@@ -107,12 +107,12 @@ class CoinMarketDetails : BaseCompatActivity() {
         val coinToSymbol = Coin.getSymbol(this.coinTo!!)
         val coinFromSymbol = Coin.getSymbol(this.coinFrom!!)
 
-        val price = coin!!.getValueFromHistorical(coinToSymbol, null, "price") as Double
+        val price = coin!!.getValueFromHistorical(this.coinTo!!, null, "price").toString().toDoubleOrNull()
 
         if (price != null) {
             price_details_textview.text = coinToSymbol + " " + price
         }
-        val open = coin!!.getValueFromHistorical(coinToSymbol, null, "open") as Double
+        val open = coin!!.getValueFromHistorical(this.coinTo!!, null, "open").toString().toDoubleOrNull()
         if (open != null && price != null) {
 
             var percentage_change = 100 - (open * 100 / price)
@@ -139,9 +139,9 @@ class CoinMarketDetails : BaseCompatActivity() {
             percentage_details_textview.text = ""
         }
 
-        val supply = coin.getLastValueFromHistorical(coinToSymbol, "supply") as Double
+        val supply = coin.getLastValueFromHistorical(this.coinTo!!, "supply").toString().toDoubleOrNull()
 
-        val marketCapCoinTo = supply * price
+        val marketCapCoinTo = if (supply != null && price != null) supply * price else .0
 
         val marketCapCoinTo_str = String.format(coinToSymbol + " %,.2f", marketCapCoinTo) // format the number separating by thousand and with two decimals
 
@@ -153,13 +153,16 @@ class CoinMarketDetails : BaseCompatActivity() {
         val marketCapCoinFrom_textview = _mRootView!!.findViewById(R.id.market_cap_details_coinfrom) as TextView
         marketCapCoinFrom_textview.text = marketCapCoinFrom_str
 
-        val volume24hTo = coin!!.getValueFromHistorical(coinToSymbol, null, "volume", 3, Coin.Companion.price_period.DAILY) as Double
+        val _24hInSecs = Coin.Companion.price_period.DAILY.time_lapse_in_seconds.toLong()
+        val volume24hTo = coin.aggregateValuesFromHistorical(this.coinTo!!, _24hInSecs, null, "volume", 3, Coin.Companion.price_period.MINUTE)
+
+        // val volume24hTo = coin!!.getValueFromHistorical(this.coinTo!!, null, "volume", 3, Coin.Companion.price_period.DAILY).toString().toDoubleOrNull()
 
         val volume24hTo_str = String.format(coinToSymbol + " %,.2f", volume24hTo) // format the number separating by thousand and with two decimals
         val volume24hTo_textview = _mRootView!!.findViewById(R.id.volume_24h_details_to) as TextView
         volume24hTo_textview.text = volume24hTo_str
 
-        val volume24hFrom = volume24hTo * price;
+        val volume24hFrom = if (volume24hTo != null && price != null) volume24hTo * price else .0
         val volume24hFrom_str = String.format(coinFromSymbol + " %,.2f", volume24hFrom) // format the number separating by thousand and with two decimals
         val volume24hFrom_textview = _mRootView!!.findViewById(R.id.volume_24h_details_from) as TextView
         volume24hFrom_textview.text = volume24hFrom_str
@@ -205,7 +208,7 @@ class CoinMarketDetails : BaseCompatActivity() {
             val historical_map_value = coinPriceHistoryIterator.next()
             lowest_time = historical_map_value.get("time").toString().toLong()
         }
-        this.bottomBound = if (this.mGranurality == Coin.Companion.price_period.MINUTE) {
+        this.bottomBound = if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.MINUTE) {
             now - (Coin.Companion.price_period.MINUTE.time_lapse_in_seconds * 60 * 1000) // 1H
         } else if (this.mGranurality == CoinMarketModel.Companion._api_price_granularity.HOURLY) {
             now - (Coin.Companion.price_period.MINUTE.time_lapse_in_seconds * 1000 * 3) // 3H

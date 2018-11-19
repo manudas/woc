@@ -9,13 +9,6 @@
     android:background="#131A24"
     tools:context="coinmarket.CoinMarket">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/top_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <LinearLayout
         android:id="@+id/coinMarketCapTitleLinearLayout"
         android:layout_width="0dp"
@@ -27,7 +20,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include">
+        app:layout_constraintTop_toTopOf="parent" >
 
         <TextView
             android:id="@+id/coinMarketCapTitle"
