@@ -16,7 +16,9 @@
         </activity>
         <activity
             android:name=".CoinMarket"
-            android:label="@string/title_activity_coin_market">
+            android:label="@string/title_activity_coin_market"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/FullscreenTheme">
 
 
             <intent-filter>

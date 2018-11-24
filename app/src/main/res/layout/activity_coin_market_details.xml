@@ -197,7 +197,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="15dp"
-            android:layout_weight="0.070033333"
+            android:layout_weight="0.080033333"
             android:background="@drawable/borders"
             android:paddingBottom="5dp"
             android:paddingEnd="8dp"
@@ -268,7 +268,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.070033333"
+            android:layout_weight="0.080033333"
             android:background="@drawable/borders"
             android:paddingBottom="5dp"
             android:paddingEnd="8dp"
@@ -444,7 +444,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.0456"></RelativeLayout>
+            android:layout_weight="0.0256"></RelativeLayout>
 
         <!-- back arrow -->
         <RelativeLayout
@@ -470,7 +470,7 @@
                     android:paddingTop="2sp">
                     <!-- back arrow image -->
                     <ImageView
-                        android:id="@+id/newsBackButton"
+                        android:id="@+id/marketCapBackButton"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"

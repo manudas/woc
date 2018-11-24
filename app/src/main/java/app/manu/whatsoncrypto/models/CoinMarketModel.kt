@@ -254,13 +254,13 @@ class CoinMarketModel {
             for (key_currency in keys_conversionTo) {
 
                 val priceValueStructure = priceToValues.get(key_currency) as JSONObject
-                val time = priceValueStructure.get("LASTUPDATE")
-                val max =  priceValueStructure.get("HIGH24HOUR")
-                val min =  priceValueStructure.get("LOW24HOUR")
-                val current_price = priceValueStructure.get("PRICE")
-                val open = priceValueStructure.get("OPEN24HOUR")
-                val supply = priceValueStructure.get("SUPPLY")
-                val volume = priceValueStructure.get("VOLUME24HOUR")
+                val time = priceValueStructure.get("LASTUPDATE").toString().toLong()
+                val max =  priceValueStructure.get("HIGH24HOUR").toString().toDouble()
+                val min =  priceValueStructure.get("LOW24HOUR").toString().toDouble()
+                val current_price = priceValueStructure.get("PRICE").toString().toDouble()
+                val open = priceValueStructure.get("OPEN24HOUR").toString().toDouble()
+                val supply = priceValueStructure.get("SUPPLY").toString().toDouble()
+                val volume = priceValueStructure.get("VOLUME24HOUR").toString().toDouble()
 
                 val dataPriceMap: MutableMap<String, Any?> = mutableMapOf()
                 dataPriceMap["time"] = time
@@ -268,11 +268,13 @@ class CoinMarketModel {
                 dataPriceMap["min"] = min
                 dataPriceMap["price"] = current_price
                 dataPriceMap["open"] = open
-                dataPriceMap["supply"] = supply
+                //dataPriceMap["supply"] = supply
                 dataPriceMap["volume"] = volume
-                dataPriceMap["price_period"] = Coin.Companion.price_period.DAILY
+                // dataPriceMap["price_period"] = Coin.Companion.price_period.DAILY
 
-                coin.addHistorical(key_currency, dataPriceMap)
+                coin.supply = supply
+
+                coin.addHistorical(key_currency, dataPriceMap, Coin.Companion.price_period.DAILY)
 
                 if (current_price != null) {
                     // ARREGLAR ESTO coin.lastPrice = current_price
@@ -402,14 +404,14 @@ class CoinMarketModel {
             val min = current_price_detail.get("low").toString().toDouble()
             val current_price = current_price_detail.get("close").toString().toDouble()
             val open = current_price_detail.get("open").toString().toDouble()
-            val volume = current_price_detail.get("open").toString().toDouble()
+            val volume = current_price_detail.get("volumefrom").toString().toDouble()
 
             priceDataInTime["time"] = time
             priceDataInTime["max"] = max
             priceDataInTime["min"] = min
             priceDataInTime["price"] = current_price
             priceDataInTime["open"] = open
-            priceDataInTime["supply"] = null
+            //priceDataInTime["supply"] = null
             priceDataInTime["volume"] = volume
 
             coin!!.addHistorical(coinTo, priceDataInTime)

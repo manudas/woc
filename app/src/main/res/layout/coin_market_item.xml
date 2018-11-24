@@ -50,7 +50,8 @@
                 android:gravity="center"
                 android:text="name"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/big_font" />
+                android:textSize="@dimen/big_font"
+                android:maxLines="1" />
         </RelativeLayout>
 
         <RelativeLayout

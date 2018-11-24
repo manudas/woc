@@ -19,6 +19,7 @@ import app.manu.whatsoncrypto.activities.BaseCompatActivity
 import app.manu.whatsoncrypto.classes.coin.Coin
 
 import app.manu.whatsoncrypto.coinmarket.CoinMarketDetails
+import kotlinx.android.synthetic.main.activity_coin_market_details.*
 
 
 class CoinMarket : BaseCompatActivity() {
@@ -29,7 +30,6 @@ class CoinMarket : BaseCompatActivity() {
     private var _mDataRootView: ViewGroup? = null
     private var _mCoinLimitByPage = 10
     private var _mCoinListCurrentPage = 0
-
 
     companion object {
         public var SelectedCurrencyTo: String = "USD"
@@ -149,11 +149,11 @@ class CoinMarket : BaseCompatActivity() {
          *
          */
 
-        val price = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "price").toString().toDoubleOrNull()
+        val price = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "price", 3, Coin.Companion.price_period.DAILY).toString().toDoubleOrNull()
 
         coin_price_textview.text = price.toString() + " " + Coin.getSymbol(SelectedCurrencyTo)
 
-        var open = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "open").toString().toDoubleOrNull()
+        var open = coin.getValueFromHistorical(SelectedCurrencyTo.toUpperCase(), null, "open", 3, Coin.Companion.price_period.DAILY).toString().toDoubleOrNull()
         if (open == null) {
             open = .0
         }

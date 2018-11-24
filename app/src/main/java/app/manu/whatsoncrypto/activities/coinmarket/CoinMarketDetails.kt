@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import app.manu.whatsoncrypto.R
 import app.manu.whatsoncrypto.activities.BaseCompatActivity
@@ -15,6 +16,7 @@ import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import kotlinx.android.synthetic.main.activity_coin_market_details.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -79,6 +81,10 @@ class CoinMarketDetails : BaseCompatActivity() {
             this.setScrollable()
             // this.setScale(null)
             this.setDateLabelFormatter()
+
+            val backButton = _mRootView!!.findViewById(R.id.marketCapBackButton) as ImageView
+            backButton.setOnClickListener { finish() }
+
         } else {
             throw RuntimeException("No coin passed to CoinMarketDetails Activity")
         }
@@ -139,7 +145,9 @@ class CoinMarketDetails : BaseCompatActivity() {
             percentage_details_textview.text = ""
         }
 
-        val supply = coin.getLastValueFromHistorical(this.coinTo!!, "supply").toString().toDoubleOrNull()
+
+        // val supply = coin.getLastValueFromHistorical(this.coinTo!!, "supply").toString().toDoubleOrNull()
+        val supply = coin.supply
 
         val marketCapCoinTo = if (supply != null && price != null) supply * price else .0
 
@@ -154,17 +162,17 @@ class CoinMarketDetails : BaseCompatActivity() {
         marketCapCoinFrom_textview.text = marketCapCoinFrom_str
 
         val _24hInSecs = Coin.Companion.price_period.DAILY.time_lapse_in_seconds.toLong()
-        val volume24hTo = coin.aggregateValuesFromHistorical(this.coinTo!!, _24hInSecs, null, "volume", 3, Coin.Companion.price_period.MINUTE)
 
-        // val volume24hTo = coin!!.getValueFromHistorical(this.coinTo!!, null, "volume", 3, Coin.Companion.price_period.DAILY).toString().toDoubleOrNull()
-
-        val volume24hTo_str = String.format(coinToSymbol + " %,.2f", volume24hTo) // format the number separating by thousand and with two decimals
-        val volume24hTo_textview = _mRootView!!.findViewById(R.id.volume_24h_details_to) as TextView
-        volume24hTo_textview.text = volume24hTo_str
-
-        val volume24hFrom = if (volume24hTo != null && price != null) volume24hTo * price else .0
+        val volume24hFrom = coin.aggregateValuesFromHistorical(this.coinTo!!, _24hInSecs, null, "volume", 3, Coin.Companion.price_period.MINUTE)
         val volume24hFrom_str = String.format(coinFromSymbol + " %,.2f", volume24hFrom) // format the number separating by thousand and with two decimals
         val volume24hFrom_textview = _mRootView!!.findViewById(R.id.volume_24h_details_from) as TextView
+
+
+        val volume24hTo = if (volume24hFrom != null && price != null) volume24hFrom * price else .0
+        val volume24hTo_str = String.format(coinToSymbol + " %,.2f", volume24hTo) // format the number separating by thousand and with two decimals
+        val volume24hTo_textview = _mRootView!!.findViewById(R.id.volume_24h_details_to) as TextView
+
+        volume24hTo_textview.text = volume24hTo_str
         volume24hFrom_textview.text = volume24hFrom_str
 
         val circulating_supply_str = String.format(coinFromSymbol + " %,.2f", supply) // format the number separating by thousand and with two decimals

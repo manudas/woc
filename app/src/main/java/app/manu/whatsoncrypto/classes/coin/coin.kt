@@ -184,15 +184,15 @@ class Coin (name: String?) {
             }
         }
 
-    private var supply: Long? = null
+    var supply: Double? = null
         get() = field
-        set(value: Long?) {
-            supply = value
+        set(value: Double?) {
+            field = value
         }
-    private var maxSupply: Long? = null
+    var maxSupply: Double? = null
         get() = field
-        set(value: Long?) {
-            maxSupply = value
+        set(value: Double?) {
+            field = value
         }
 
     /* usd/eur -> time -> min/max in time period -> price */
