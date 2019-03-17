@@ -10,9 +10,11 @@ import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Toast
 import app.manu.whatsoncrypto.CoinMarket
 import app.manu.whatsoncrypto.R
 import app.manu.whatsoncrypto.activities.news.NewsActivity
+import app.manu.whatsoncrypto.utils.AppNetworkStatus.AppNetworkStatus
 import kotlin.reflect.KClass
 
 open class BaseCompatActivity: AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -26,6 +28,14 @@ open class BaseCompatActivity: AppCompatActivity(), NavigationView.OnNavigationI
     private var _mDrawerRoot: NavigationView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        if (AppNetworkStatus.getInstance(this).isOnline) {
+            Toast.makeText(applicationContext,"Fetching data",Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(applicationContext,"You are not online!!!!",Toast.LENGTH_LONG).show()
+            finish()
+        }
+
         super.onCreate(savedInstanceState)
         // The base layout that contains your navigation drawer
         super.setContentView(R.layout.app_base_layout_with_drawer_menu)
